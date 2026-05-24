@@ -1,4 +1,4 @@
-import { registerModel, queryUserNameModel } from '../model/user.js'
+import { registerModel, queryUserNameModel, loginModel } from '../model/user.js'
 
 // 用户注册
 export const register = async (req, res, next) => {
@@ -37,9 +37,26 @@ export const checkUsername = async (req, res, next) => {
   }
 }
 
+// 用户登录
 export const login = async (req, res, next) => {
   try {
-
+    const { user_name, user_password } = req.body
+    const result = await loginModel(user_name, user_password)
+    if (result) {
+      res.json({
+        code: 200,
+        message: '用户登录成功',
+        data: {
+          user_name,
+          token: result
+        }
+      })
+    } else {
+      res.json({
+        code: 4001,
+        message: '用户名或密码错误'
+      })
+    }
   } catch (err) {
     next(err)
   }

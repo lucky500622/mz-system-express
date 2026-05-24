@@ -16,3 +16,13 @@ export const registerValidator = validate([
     .notEmpty().withMessage('密码不能为空').bail()
     .isLength({ min: 6, max: 12 }).withMessage('密码长度必须在6-12个字符之间')
 ])
+
+// 用户登录校验
+export const loginValidator = validate([
+  body('user_name')
+    .notEmpty().withMessage('用户名不能为空').bail()
+    .isLength({ min: 3, max: 20 }).withMessage('用户名长度必须在3-20个字符之间').bail(),
+  body('user_password')
+    .notEmpty().withMessage('密码不能为空').bail()
+    .isLength({ min: 6, max: 12 }).withMessage('密码长度必须在6-12个字符之间')
+])

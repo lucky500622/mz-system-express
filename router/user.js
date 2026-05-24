@@ -1,8 +1,8 @@
 import express from 'express'
 const router = express.Router()
 
-import { register, checkUsername } from '../controller/user.js'
-import { registerValidator } from '../validator/user.js'
+import { register, checkUsername, login } from '../controller/user.js'
+import { registerValidator, loginValidator } from '../validator/user.js'
 
 // 用户注册
 router.post('/register', registerValidator, register)
@@ -11,6 +11,6 @@ router.post('/register', registerValidator, register)
 router.get('/register/checkUsername', checkUsername)
 
 // 用户登录
-// router.post('/login', login)
+router.post('/login', loginValidator, login)
 
 export default router

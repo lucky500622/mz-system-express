@@ -17,9 +17,29 @@ export const registerModel = async (user_name, user_password) => {
   // 默认对应角色
   const role = 'staff'
   // 密码加密
-  user_password = md5('ljycss' + user_password)
+  user_password = md5(user_password)
 
   const sql = 'INSERT INTO t_user VALUES(?, ?, ?, ?)'
-  const [res] = await pool.query(sql, [id, user_name, user_password, role])
-  return res
+  await pool.query(sql, [id, user_name, user_password, role])
+}
+
+// 用户登录
+export const loginModel = async (user_name, user_password) => {
+  // 密码加密
+  user_password = md5(user_password)
+
+  const sql = 'SELECT * FROM t_user WHERE user_name = ? AND user_password = ?'
+  const [res] = await pool.query(sql, [user_name, user_password])
+
+  if (res.length > 0) {
+    // 生成随机token与过期时间
+    const token = uuidv4()
+    const expireData = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)
+
+    const sql = 'INSERT INTO t_user_session(us_token, us_id, us_expire_time) VALUES(?, ?, ?)'
+    await pool.query(sql, [token, res[0].user_id, expireData])
+    return token
+  } else {
+    return null
+  }
 }
