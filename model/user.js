@@ -19,22 +19,7 @@ export const registerModel = async (user_name, user_password) => {
   // 密码加密
   user_password = md5('ljycss' + user_password)
 
-  // 新建数据库连接
-  const connection = await pool.getConnection()
-  try {
-    // 开启事务
-    await connection.beginTransaction()
-    // 执行注册操作
-    const sql = 'INSERT INTO t_user VALUES(?, ?, ?, ?)'
-    const [res] = await connection.query(sql, [id, user_name, user_password, role])
-    // 提交事务
-    await connection.commit()
-    // 返回注册结果
-    return res
-  } catch (err) {
-    // 回滚事务
-    await connection.rollback()
-    // 抛出错误
-    throw err
-  }
+  const sql = 'INSERT INTO t_user VALUES(?, ?, ?, ?)'
+  const [res] = await pool.query(sql, [id, user_name, user_password, role])
+  return res
 }

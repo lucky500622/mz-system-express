@@ -11,6 +11,6 @@ router.post('/register', registerValidator, register)
 router.get('/register/checkUsername', checkUsername)
 
 // 用户登录
-router.post('/login', login)
+// router.post('/login', login)
 
 export default router
