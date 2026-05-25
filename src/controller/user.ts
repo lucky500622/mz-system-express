@@ -1,10 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
-import md5 from '../utils/md5.js'
+import md5 from '../utils/md5.ts'
 
-import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel } from '../model/user.js'
+import { Controller } from '../types/express.ts'
+
+import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel } from '../model/user.ts'
 
 // 用户注册
-export const register = async (req, res, next) => {
+export const register: Controller<void> = async (req, res, next) => {
   try {
     const { user_name, user_password } = req.body
     const id = uuidv4()
@@ -25,10 +27,10 @@ export const register = async (req, res, next) => {
 }
 
 // 用户名查重
-export const checkUsername = async (req, res, next) => {
+export const checkUsername: Controller<void> = async (req, res, next) => {
   try {
     const { user_name } = req.query
-    const result = await queryUserNameModel(user_name)
+    const result = await queryUserNameModel(user_name as string)
 
     res.json({
       code: 200,
@@ -44,7 +46,7 @@ export const checkUsername = async (req, res, next) => {
 }
 
 // 用户登录
-export const login = async (req, res, next) => {
+export const login: Controller<void> = async (req, res, next) => {
   try {
     const { user_name, user_password } = req.body
     const encryptedPassword = md5(user_password)

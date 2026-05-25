@@ -1,6 +1,8 @@
-import { validationResult } from 'express-validator'
+import { Controller } from '../types/express.ts'
 
-const validate = validations => {
+import { validationResult, ValidationChain } from 'express-validator'
+
+const validate = (validations: ValidationChain[]): Controller<void> => {
   return async (req, res, next) => {
     // 校验请求体数据
     await Promise.all(validations.map(validation => validation.run(req)))

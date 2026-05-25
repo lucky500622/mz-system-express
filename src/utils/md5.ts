@@ -1,7 +1,7 @@
 import crypto from 'crypto'
 
 // 导出md5加密函数，hex为16进制字符串
-export default function md5(str) {
+export default function md5(str: string) {
   return crypto.createHash('md5').update('ljycss' + str).digest('hex')
 }
 
