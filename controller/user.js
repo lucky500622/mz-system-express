@@ -1,10 +1,16 @@
-import { registerModel, queryUserNameModel, loginModel } from '../model/user.js'
+import { v4 as uuidv4 } from 'uuid'
+import md5 from '../utils/md5.js'
+
+import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel } from '../model/user.js'
 
 // 用户注册
 export const register = async (req, res, next) => {
   try {
     const { user_name, user_password } = req.body
-    await registerModel(user_name, user_password)
+    const id = uuidv4()
+    const role = 'staff'
+    const encryptedPassword = md5(user_password)
+    await registerModel(id, user_name, encryptedPassword, role)
 
     res.json({
       code: 200,
@@ -41,20 +47,25 @@ export const checkUsername = async (req, res, next) => {
 export const login = async (req, res, next) => {
   try {
     const { user_name, user_password } = req.body
-    const result = await loginModel(user_name, user_password)
-    if (result) {
+    const encryptedPassword = md5(user_password)
+    const user_id = await loginCheckModel(user_name, encryptedPassword)
+    if (user_id) {
+      // 生成随机token与过期时间
+      const token = uuidv4()
+      const expireData = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)
+      await createTokenModel(token, user_id, expireData)
       res.json({
         code: 200,
         message: '用户登录成功',
         data: {
           user_name,
-          token: result
+          token,
         }
       })
     } else {
       res.json({
         code: 4001,
-        message: '用户名或密码错误'
+        message: '用户登录失败，用户名或密码错误',
       })
     }
   } catch (err) {

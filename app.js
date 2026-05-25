@@ -6,7 +6,7 @@ import cors from 'cors'
 
 import router from './router/index.js'
 import { errorHandler } from './middleware/errorHandler.js'
-import { checkAllTokenModel } from './scripts/checkExpireToken.js'
+import { checkAllExpireToken } from './scripts/checkExpireToken.js'
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -24,7 +24,7 @@ app.listen(PORT, async () => {
   console.log(`Server is running http://localhost:${PORT}`)
   // 启动时检查过期token
   try {
-    const res = await checkAllTokenModel()
+    const res = await checkAllExpireToken()
     if (res > 0) console.log(`更新 ${res} 条过期token`)
   } catch (error) {
     console.log('更新过期token失败', error)

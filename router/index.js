@@ -3,7 +3,12 @@ const router = express.Router()
 
 import userRouter from './user.js'
 
+import { checkToken } from '../middleware/checkToken.js'
+
 // 用户路由
 router.use('/user', userRouter)
+
+// token鉴权
+router.use(checkToken)
 
 export default router
