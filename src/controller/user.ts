@@ -3,7 +3,7 @@ import md5 from '../utils/md5.ts'
 
 import { Controller } from '../types/express.ts'
 
-import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel } from '../model/user.ts'
+import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel, userInfoModel } from '../model/user.ts'
 
 // 用户注册
 export const register: Controller<void> = async (req, res, next) => {
@@ -70,6 +70,25 @@ export const login: Controller<void> = async (req, res, next) => {
         message: '用户登录失败，用户名或密码错误',
       })
     }
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 用户信息获取
+export const userInfo: Controller<void> = async (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization
+    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
+    const userInfo = await userInfoModel(token)
+    res.json({
+      code: 200,
+      message: '用户信息获取成功',
+      data: {
+        user_name: userInfo.user_name,
+        user_role: userInfo.user_role,
+      }
+    })
   } catch (err) {
     next(err)
   }

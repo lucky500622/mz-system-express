@@ -29,3 +29,10 @@ export const createTokenModel = async (token: string, id: string, expireData: Da
   const sql = 'INSERT INTO t_user_session(us_token, us_id, us_expire_time) VALUES(?, ?, ?)'
   await pool.query<RowDataPacket[]>(sql, [token, id, expireData])
 }
+
+// 用户信息获取
+export const userInfoModel = async (token: string) => {
+  const sql = 'SELECT user_name, user_role FROM t_user WHERE user_id = (SELECT us_id FROM t_user_session WHERE us_token = ?)'
+  const [res] = await pool.query<RowDataPacket[]>(sql, [token])
+  return res[0]
+}
