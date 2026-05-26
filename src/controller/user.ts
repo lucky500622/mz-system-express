@@ -9,6 +9,19 @@ import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel, u
 export const register: Controller<void> = async (req, res, next) => {
   try {
     const { user_name, user_password } = req.body
+    // 校验用户名是否存在
+    const isExist = await queryUserNameModel(user_name)
+    if (isExist) {
+      res.json({
+        code: 400,
+        message: '用户名已存在',
+        data: {
+          isExist
+        }
+      })
+      return
+    }
+    // 注册用户
     const id = uuidv4()
     const role = 'staff'
     const encryptedPassword = md5(user_password)
@@ -18,26 +31,7 @@ export const register: Controller<void> = async (req, res, next) => {
       code: 200,
       message: '用户注册成功',
       data: {
-        user_name,
-      }
-    })
-  } catch (err) {
-    next(err)
-  }
-}
-
-// 用户名查重
-export const checkUsername: Controller<void> = async (req, res, next) => {
-  try {
-    const { user_name } = req.query
-    const result = await queryUserNameModel(user_name as string)
-
-    res.json({
-      code: 200,
-      message: '用户名查重成功',
-      data: {
-        user_name,
-        isExist: result,
+        isExist: false,
       }
     })
   } catch (err) {
