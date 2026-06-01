@@ -3,6 +3,7 @@ const router = express.Router()
 
 import userRouter from './user.ts'
 import warehouseRouter from './warehouse.ts'
+import productRouter from './product.ts'
 
 import { checkToken } from '../middleware/checkToken.ts'
 
@@ -14,5 +15,8 @@ router.use(checkToken)
 
 // 仓库路由
 router.use('/warehouse', warehouseRouter)
+
+// 商品路由
+router.use('/product', productRouter)
 
 export default router
