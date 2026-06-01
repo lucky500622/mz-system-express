@@ -3,7 +3,7 @@ const router = express.Router()
 
 import { checkToken } from '../middleware/checkToken.ts'
 import { register, login, userInfo } from '../controller/user.ts'
-import { registerValidator, loginValidator, checkUsernameValidator } from '../validator/user.ts'
+import { registerValidator, loginValidator } from '../validator/user.ts'
 
 // 用户注册
 router.post('/register', registerValidator, register)
