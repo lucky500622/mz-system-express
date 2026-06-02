@@ -3,6 +3,7 @@ import md5 from '../utils/md5.ts'
 
 import { Controller } from '../types/express.ts'
 
+import { getToken } from '../utils/getToken.ts'
 import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel, userInfoModel } from '../model/user.ts'
 
 // 用户注册
@@ -72,8 +73,7 @@ export const login: Controller<void> = async (req, res, next) => {
 // 用户信息获取
 export const userInfo: Controller<void> = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
+    const token = getToken(req)
     const userInfo = await userInfoModel(token)
     res.json({
       code: 200,

@@ -1,11 +1,11 @@
 import { Controller } from '../types/express.ts'
 
+import { getToken } from '../utils/getToken.ts'
 import { checkTokenModel, updateTokenStatusModel } from '../model/token.ts'
 
 export const checkToken: Controller<void> = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization
-    const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : null
+    const token = getToken(req)
     if (!token) {
       res.status(401).json({
         message: 'token不能为空',
