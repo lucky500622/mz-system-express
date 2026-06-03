@@ -5,16 +5,16 @@ import pool from '../config/db.ts'
 
 import { getToken } from '../utils/getToken.ts'
 import { userInfoModel } from '../model/user.ts'
-import { warehouseInfoModel, addWarehouseModel, warehouseActionInfoModel, addWareActionInfoModel } from '../model/warehouse.ts'
+import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
 // 分页获取仓库信息
-export const pageWarehouseInfo: Controller<void> = async (req, res, next) => {
+export const warehousePageInfo: Controller<void> = async (req, res, next) => {
   try {
     const { offset = 0, limit = 10 } = req.query
     const pageOffset = Number(offset)
     const pageLimit = Number(limit)
-    const warehouseInfo = await warehouseInfoModel(pageOffset, pageLimit)
+    const warehouseInfo = await warehousePageInfoModel(pageOffset, pageLimit)
     res.json({
       code: 200,
       message: '仓库信息获取成功',
@@ -28,12 +28,12 @@ export const pageWarehouseInfo: Controller<void> = async (req, res, next) => {
 }
 
 // 分页获取仓库操作信息
-export const pageWarehouseActionInfo: Controller<void> = async (req, res, next) => {
+export const warehousePageActionInfo: Controller<void> = async (req, res, next) => {
   try {
     const { offset = 0, limit = 10 } = req.query
     const pageOffset = Number(offset)
     const pageLimit = Number(limit)
-    const actionInfo = await warehouseActionInfoModel(pageOffset, pageLimit)
+    const actionInfo = await warehousePageActionInfoModel(pageOffset, pageLimit)
     res.json({
       code: 200,
       message: '仓库操作信息获取成功',
