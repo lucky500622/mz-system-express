@@ -5,7 +5,7 @@ import pool from '../config/db.ts'
 // 分页获取商品信息
 export const productPageInfoModel = async (offset: number, limit: number, connection?: any) => {
   const exec = (connection || pool) as typeof pool
-  const sql = 'SELECT m_id, product_belong_id, product_name, product_type, product_num, product_description FROM t_product WHERE is_delete = 0 ORDER BY m_id ASC LIMIT ?, ?'
+  const sql = 'SELECT t_product.m_id, t_warehouse.m_id AS warehouse_m_id, product_name, product_type, product_num, product_description FROM t_product INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id WHERE t_product.is_delete = 0 AND t_warehouse.is_delete = 0 ORDER BY t_product.m_id ASC LIMIT ?, ?'
   const [res] = await exec.query<RowDataPacket[]>(sql, [offset, limit])
   return res
 }

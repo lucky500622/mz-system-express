@@ -63,7 +63,7 @@ export const addProduct: Controller<void> = async (req, res, next) => {
       const warehouseInfo = await warehouseInfoModel(m_id, connection)
       if (!warehouseInfo.length) {
         res.json({
-          code: 400,
+          code: 4003,
           message: '仓库不存在'
         })
         connection.rollback()
