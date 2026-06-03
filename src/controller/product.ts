@@ -61,7 +61,7 @@ export const addProduct: Controller<void> = async (req, res, next) => {
       // 验证仓库是否存在
       const m_id = req.body.m_id
       const warehouseInfo = await warehouseInfoModel(m_id, connection)
-      if (!warehouseInfo.length) {
+      if (!warehouseInfo) {
         res.json({
           code: 4003,
           message: '仓库不存在'
@@ -73,7 +73,7 @@ export const addProduct: Controller<void> = async (req, res, next) => {
       // 新增商品
       const { product_name, product_type, product_num, product_description } = req.body
       const product_id = uuidv4()
-      const product_isAdd = await addProductModel(product_id, warehouseInfo[0].warehouse_id, product_name, product_type, product_num, product_description, connection)
+      const product_isAdd = await addProductModel(product_id, warehouseInfo.warehouse_id, product_name, product_type, product_num, product_description, connection)
       if (!product_isAdd) throw new Error('商品新增失败')
 
       // 新增操作信息
