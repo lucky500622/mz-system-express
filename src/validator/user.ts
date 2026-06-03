@@ -5,12 +5,14 @@ import validate from '../middleware/validate.ts'
 export const registerValidator = validate([
   body('user_name')
     .notEmpty().withMessage('用户名不能为空').bail()
+    .isString().withMessage('用户名必须是字符串').bail()
     .isLength({ min: 3, max: 20 }).withMessage('用户名长度必须在3-20个字符之间').bail()
     .matches(/^[a-zA-Z0-9]+$/).withMessage('用户名只能包含字母和数字'),
 
   body('user_password')
     .notEmpty().withMessage('密码不能为空').bail()
-    .isLength({ min: 6, max: 12 }).withMessage('密码长度必须在6-12个字符之间')
+    .isString().withMessage('密码必须是字符串').bail()
+    .isLength({ min: 6, max: 12 }).withMessage('密码长度必须在6-12个字符之间').bail()
     .matches(/^[a-zA-Z0-9]+$/).withMessage('密码只能包含字母和数字').bail()
 ])
 
@@ -18,10 +20,12 @@ export const registerValidator = validate([
 export const loginValidator = validate([
   body('user_name')
     .notEmpty().withMessage('用户名不能为空').bail()
+    .isString().withMessage('用户名必须是字符串').bail()
     .isLength({ min: 3, max: 20 }).withMessage('用户名长度必须在3-20个字符之间').bail()
     .matches(/^[a-zA-Z0-9]+$/).withMessage('用户名只能包含字母和数字').bail(),
   body('user_password')
     .notEmpty().withMessage('密码不能为空').bail()
-    .isLength({ min: 6, max: 12 }).withMessage('密码长度必须在6-12个字符之间')
+    .isString().withMessage('密码必须是字符串').bail()
+    .isLength({ min: 6, max: 12 }).withMessage('密码长度必须在6-12个字符之间').bail()
     .matches(/^[a-zA-Z0-9]+$/).withMessage('密码只能包含字母和数字').bail()
 ])
