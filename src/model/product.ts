@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket, OkPacket } from 'mysql2'
 
 import pool from '../config/db.ts'
 
@@ -22,15 +22,19 @@ export const productPageActionInfoModel = async (offset: number, limit: number, 
 export const addProductModel = async (product_id: string, product_belong_id: string, product_name: string, product_type: string, product_num: number, product_description: string, connection?: any) => {
   const exec = (connection || pool) as typeof pool
   // 拼接字段数组与值数组
-  const fieldArr = ['product_id', 'product_belong_id', 'product_name', 'product_type', 'product_num']
-  const valArr: (string | number)[] = [product_id, product_belong_id, product_name, product_type, product_num]
+  const fieldArr = ['product_id', 'product_belong_id', 'product_name', 'product_num']
+  const valArr: (string | number)[] = [product_id, product_belong_id, product_name, product_num]
   if (product_description) {
     fieldArr.push('product_description')
     valArr.push(product_description)
   }
+  if (product_type) {
+    fieldArr.push('product_type')
+    valArr.push(product_type)
+  }
   const sql = `INSERT INTO t_product(${fieldArr.join(', ')}) VALUES(${valArr.map(() => '?').join(', ')})`
-  const res = await exec.query<RowDataPacket[]>(sql, valArr)
-  return res.length > 0
+  const [res] = await exec.query<OkPacket>(sql, valArr)
+  return res.affectedRows > 0
 }
 
 // 新增商品操作信息
@@ -44,6 +48,6 @@ export const addProductActionInfoModel = async (issue_id: string, product_id: st
     valArr.push(action_num)
   }
   const sql = `INSERT INTO t_product_action_info(${fieldArr.join(', ')}) VALUES(${valArr.map(() => '?').join(', ')})`
-  const [res] = await exec.query<RowDataPacket[]>(sql, valArr)
-  return res.length > 0
+  const [res] = await exec.query<OkPacket>(sql, valArr)
+  return res.affectedRows > 0
 }

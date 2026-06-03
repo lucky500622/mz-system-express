@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket, OkPacket } from 'mysql2'
 
 import pool from '../config/db.ts'
 
@@ -6,6 +6,6 @@ import pool from '../config/db.ts'
 export const addIssueInfoModel = async (issue_id: string, user_id: string, connection?: any) => {
   const exec = (connection || pool) as typeof pool
   const sql = 'INSERT INTO t_issue_info(issue_id, user_id) VALUES(?, ?)'
-  const [res] = await exec.query<RowDataPacket[]>(sql, [issue_id, user_id])
-  return res.length > 0
+  const [res] = await exec.query<OkPacket>(sql, [issue_id, user_id])
+  return res.affectedRows > 0
 }

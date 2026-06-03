@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket, OkPacket } from 'mysql2'
 
 import pool from '../config/db.ts'
 
@@ -23,7 +23,7 @@ export const warehouseInfoModel = async (m_id: string, connection?: any) => {
   const exec = (connection || pool) as typeof pool
   const sql = 'SELECT m_id, warehouse_id, warehouse_name, warehouse_create_time FROM t_warehouse WHERE m_id = ?'
   const [res] = await exec.query<RowDataPacket[]>(sql, [m_id])
-  return res[0]
+  return res
 }
 
 // 新增仓库
@@ -41,8 +41,8 @@ export const addWarehouseModel = async (warehouse_id: string, warehouse_name: st
     valArr.push(warehouse_description)
   }
   const sql = `INSERT INTO t_warehouse(${fieldArr.join(', ')}) VALUES(${valArr.map(() => '?').join(', ')})`
-  const [res] = await exec.query<RowDataPacket[]>(sql, valArr)
-  return res.length > 0
+  const [res] = await exec.query<OkPacket>(sql, valArr)
+  return res.affectedRows > 0
 }
 
 // 新增仓库操作信息
@@ -56,6 +56,6 @@ export const addWareActionInfoModel = async (issue_id: string, warehouse_id: str
     valArr.push(warehouse_rename)
   }
   const sql = `INSERT INTO t_warehouse_action_info(${fieldArr.join(', ')}) VALUES(${valArr.map(() => '?').join(', ')})`
-  const [res] = await exec.query<RowDataPacket[]>(sql, valArr)
-  return res.length > 0
+  const [res] = await exec.query<OkPacket>(sql, valArr)
+  return res.affectedRows > 0
 }

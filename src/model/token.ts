@@ -1,4 +1,4 @@
-import { RowDataPacket } from 'mysql2'
+import { RowDataPacket, OkPacket } from 'mysql2'
 
 import pool from '../config/db.ts'
 
@@ -14,5 +14,6 @@ export const checkTokenModel = async (token: string, connection?: any) => {
 export const updateTokenStatusModel = async (token: string, connection?: any) => {
   const exec = (connection || pool) as typeof pool
   const sql = 'UPDATE t_user_session SET token_status = 0 WHERE user_token = ?'
-  await exec.query(sql, [token])
+  const [res] = await exec.query<OkPacket>(sql, [token])
+  return res.affectedRows > 0
 }

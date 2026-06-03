@@ -1,6 +1,7 @@
 import { body } from 'express-validator'
 import validate from '../middleware/validate.ts'
 
+// 新增仓库校验
 export const addWarehouseValidator = validate([
   body('warehouse_name')
     .notEmpty().withMessage('仓库名称不能为空').bail()

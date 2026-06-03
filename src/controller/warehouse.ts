@@ -61,16 +61,16 @@ export const addWarehouse: Controller<void> = async (req, res, next) => {
       const warehouse_id = uuidv4()
       const { warehouse_name, warehouse_type, warehouse_description } = req.body
       const warehouse_isAdd = await addWarehouseModel(warehouse_id, warehouse_name, user_info.user_id, warehouse_type, warehouse_description, connection)
-      if (warehouse_isAdd) throw new Error('仓库新增失败')
+      if (!warehouse_isAdd) throw new Error('仓库新增失败')
 
       // 新增操作信息
       const issue_id = uuidv4()
       const issue_isAdd = await addIssueInfoModel(issue_id, user_info.user_id, connection)
-      if (issue_isAdd) throw new Error('操作信息新增失败')
+      if (!issue_isAdd) throw new Error('操作信息新增失败')
 
       // 新增仓库操作信息
       const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouse_id, 1, undefined, connection)
-      if (warehouse_action_isAdd) throw new Error('仓库操作信息新增失败')
+      if (!warehouse_action_isAdd) throw new Error('仓库操作信息新增失败')
 
       connection.commit()
     } catch (err) {
