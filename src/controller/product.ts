@@ -3,9 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 
 import pool from '../config/db.ts'
-import { getToken } from '../utils/getToken.ts'
-import { userInfoModel } from '../model/user.ts'
-import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel } from '../model/product.ts'
+import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel } from '../model/product.ts'
 import { warehouseInfoModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -130,6 +128,68 @@ export const deleteProduct: Controller<void> = async (req, res, next) => {
     res.json({
       code: 200,
       message: '产品删除成功'
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 调整产品数量
+export const adjustProductNum: Controller<void> = async (req, res, next) => {
+  try {
+    const connection = await pool.getConnection()
+    connection.beginTransaction()
+    // 最终库存数量
+    let endNum = 0
+    try {
+      // 获取产品信息
+      const { m_id } = req.body
+      const productInfo = await productInfoModel(m_id, connection)
+      if (!productInfo) throw new Error('产品不存在')
+
+      // 校验库存是否充足
+      const { action_type, product_num } = req.body
+      if (action_type === 4 && productInfo.product_num < product_num) {
+        res.json({
+          code: 4004,
+          message: '库存不足'
+        })
+        connection.rollback()
+        return
+      }
+
+      // 调整产品数量
+      if (action_type === 3) {
+        endNum = productInfo.product_num + product_num
+      } else if (action_type === 4) {
+        endNum = productInfo.product_num - product_num
+      }
+      const product_isUpdate = await adjustProductNumModel(m_id, endNum, connection)
+      if (!product_isUpdate) throw new Error('产品数量调整失败')
+
+      // 新增操作信息
+      const issue_id = uuidv4()
+      const issue_isAdd = await addIssueInfoModel(issue_id, res.locals.userInfo.user_id, connection)
+      if (!issue_isAdd) throw new Error('操作信息新增失败')
+
+      // 新增产品操作信息
+      const product_action_isAdd = await addProductActionInfoModel(issue_id, productInfo.product_id, action_type, product_num, connection)
+      if (!product_action_isAdd) throw new Error('产品操作信息新增失败')
+
+      connection.commit()
+    } catch (err) {
+      connection.rollback()
+      throw err
+    } finally {
+      connection.release()
+    }
+
+    res.json({
+      code: 200,
+      message: '产品数量调整成功',
+      data: {
+        endNum: endNum
+      }
     })
   } catch (err) {
     next(err)

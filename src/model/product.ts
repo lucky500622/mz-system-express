@@ -61,3 +61,11 @@ export const deleteProductModel = async (m_id: string, connection?: any): Promis
   const [res] = await exec.query<OkPacket>(sql, [m_id])
   return res.affectedRows > 0
 }
+
+// 调整产品数量
+export const adjustProductNumModel = async (m_id: string, product_num: number, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `UPDATE t_product SET product_num = ? WHERE m_id = ?`
+  const [res] = await exec.query<OkPacket>(sql, [product_num, m_id])
+  return res.affectedRows > 0
+}

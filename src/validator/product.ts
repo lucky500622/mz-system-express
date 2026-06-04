@@ -29,3 +29,16 @@ export const deleteProductValidator = validate([
     .notEmpty().withMessage('商品ID不能为空').bail()
     .isInt().withMessage('商品ID必须是整数')
 ])
+
+// 调整产品数量校验
+export const adjustProductNumValidator = validate([
+  body('m_id')
+    .notEmpty().withMessage('商品ID不能为空').bail()
+    .isInt().withMessage('商品ID必须是整数'),
+  body('action_type')
+    .notEmpty().withMessage('操作类型不能为空').bail()
+    .isInt().withMessage('操作类型必须是整数'),
+  body('product_num')
+    .notEmpty().withMessage('商品数量不能为空').bail()
+    .isInt().withMessage('商品数量必须是整数')
+])

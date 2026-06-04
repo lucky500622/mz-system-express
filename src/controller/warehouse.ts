@@ -3,8 +3,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 import pool from '../config/db.ts'
 
-import { getToken } from '../utils/getToken.ts'
-import { userInfoModel } from '../model/user.ts'
 import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
