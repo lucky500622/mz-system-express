@@ -52,11 +52,6 @@ export const addWarehouse: Controller<void> = async (req, res, next) => {
     const connection = await pool.getConnection()
     connection.beginTransaction()
     try {
-      // 验证用户是否存在
-      const token = getToken(req)
-      const user_info = await userInfoModel(token, connection)
-      if (!user_info) throw new Error('用户不存在')
-
       // 仓库名查重
       const { warehouse_name } = req.body
       const warehouse_name_isAdd = await warehouseNameCheckModel(warehouse_name, connection)
@@ -72,12 +67,12 @@ export const addWarehouse: Controller<void> = async (req, res, next) => {
       // 新增仓库
       const warehouse_id = uuidv4()
       const { warehouse_type, warehouse_description } = req.body
-      const warehouse_isAdd = await addWarehouseModel(warehouse_id, warehouse_name, user_info.user_id, warehouse_type, warehouse_description, connection)
+      const warehouse_isAdd = await addWarehouseModel(warehouse_id, warehouse_name, res.locals.userInfo.user_id, warehouse_type, warehouse_description, connection)
       if (!warehouse_isAdd) throw new Error('仓库新增失败')
 
       // 新增操作信息
       const issue_id = uuidv4()
-      const issue_isAdd = await addIssueInfoModel(issue_id, user_info.user_id, connection)
+      const issue_isAdd = await addIssueInfoModel(issue_id, res.locals.userInfo.user_id, connection)
       if (!issue_isAdd) throw new Error('操作信息新增失败')
 
       // 新增仓库操作信息
