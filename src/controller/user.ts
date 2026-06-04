@@ -14,11 +14,8 @@ export const register: Controller<void> = async (req, res, next) => {
     const isExist = await queryUserNameModel(user_name)
     if (isExist) {
       res.json({
-        code: 400,
-        message: '用户名已存在',
-        data: {
-          isExist
-        }
+        code: 4002,
+        message: '用户名已存在'
       })
       return
     }

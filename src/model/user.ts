@@ -23,7 +23,7 @@ export const loginCheckModel = async (user_name: string, user_password: string, 
   const exec = (connection || pool) as typeof pool
   const sql = 'SELECT * FROM t_user WHERE user_name = ? AND user_password = ?'
   const [res] = await exec.query<RowDataPacket[]>(sql, [user_name, user_password])
-  return res[0].user_id
+  return res[0]?.user_id
 }
 
 // 创建会话

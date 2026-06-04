@@ -55,7 +55,7 @@ export const addWarehouse: Controller<void> = async (req, res, next) => {
       const warehouse_name_isAdd = await warehouseNameCheckModel(warehouse_name, connection)
       if (warehouse_name_isAdd) {
         res.json({
-          code: 4002,
+          code: 4011,
           message: '仓库名已存在'
         })
         connection.rollback()

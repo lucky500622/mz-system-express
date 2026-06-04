@@ -56,7 +56,7 @@ export const addProduct: Controller<void> = async (req, res, next) => {
       const warehouseInfo = await warehouseInfoModel(m_id, connection)
       if (!warehouseInfo) {
         res.json({
-          code: 4003,
+          code: 4021,
           message: '仓库不存在'
         })
         connection.rollback()
@@ -151,7 +151,7 @@ export const adjustProductNum: Controller<void> = async (req, res, next) => {
       const { action_type, product_num } = req.body
       if (action_type === 4 && productInfo.product_num < product_num) {
         res.json({
-          code: 4004,
+          code: 4022,
           message: '库存不足'
         })
         connection.rollback()
