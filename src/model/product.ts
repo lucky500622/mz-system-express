@@ -41,13 +41,7 @@ export const addProductModel = async (product_id: string, product_belong_id: str
 export const addProductActionInfoModel = async (issue_id: string, product_id: string, action_type: number, action_num?: number, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool
   // 拼接字段数组与值数组
-  const fieldArr = ['issue_id', 'product_id', 'action_type']
-  const valArr: (string | number)[] = [issue_id, product_id, action_type]
-  if (action_num) {
-    fieldArr.push('action_num')
-    valArr.push(action_num)
-  }
-  const sql = `INSERT INTO t_product_action_info(${fieldArr.join(', ')}) VALUES(${valArr.map(() => '?').join(', ')})`
-  const [res] = await exec.query<OkPacket>(sql, valArr)
+  const sql = `INSERT INTO t_product_action_info(issue_id, product_id, action_type, action_num) VALUES(?, ?, ?, ?)`
+  const [res] = await exec.query<OkPacket>(sql, [issue_id, product_id, action_type, action_num])
   return res.affectedRows > 0
 }

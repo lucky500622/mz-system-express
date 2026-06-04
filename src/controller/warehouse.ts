@@ -5,7 +5,7 @@ import pool from '../config/db.ts'
 
 import { getToken } from '../utils/getToken.ts'
 import { userInfoModel } from '../model/user.ts'
-import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel } from '../model/warehouse.ts'
+import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
 // 分页获取仓库信息
@@ -57,9 +57,21 @@ export const addWarehouse: Controller<void> = async (req, res, next) => {
       const user_info = await userInfoModel(token, connection)
       if (!user_info) throw new Error('用户不存在')
 
+      // 仓库名查重
+      const { warehouse_name } = req.body
+      const warehouse_name_isAdd = await warehouseNameCheckModel(warehouse_name, connection)
+      if (warehouse_name_isAdd) {
+        res.json({
+          code: 4002,
+          message: '仓库名已存在'
+        })
+        connection.rollback()
+        return
+      }
+
       // 新增仓库
       const warehouse_id = uuidv4()
-      const { warehouse_name, warehouse_type, warehouse_description } = req.body
+      const { warehouse_type, warehouse_description } = req.body
       const warehouse_isAdd = await addWarehouseModel(warehouse_id, warehouse_name, user_info.user_id, warehouse_type, warehouse_description, connection)
       if (!warehouse_isAdd) throw new Error('仓库新增失败')
 

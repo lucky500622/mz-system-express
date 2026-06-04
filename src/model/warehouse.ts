@@ -26,6 +26,14 @@ export const warehouseInfoModel = async (m_id: string, connection?: any): Promis
   return res[0]
 }
 
+// 仓库名查重
+export const warehouseNameCheckModel = async (warehouse_name: string, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'SELECT warehouse_name FROM t_warehouse WHERE warehouse_name = ? AND is_delete = 0'
+  const [res] = await exec.query<RowDataPacket[]>(sql, [warehouse_name])
+  return res.length > 0
+}
+
 // 新增仓库
 export const addWarehouseModel = async (warehouse_id: string, warehouse_name: string, user_id: string, warehouse_type?: string, warehouse_description?: string, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool
