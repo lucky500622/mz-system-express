@@ -2,6 +2,7 @@ import { Controller } from '../types/express.ts'
 
 import { getToken } from '../utils/getToken.ts'
 import { checkTokenModel, updateTokenStatusModel } from '../model/token.ts'
+import { userInfoModel } from '../model/user.ts'
 
 export const checkToken: Controller<void> = async (req, res, next) => {
   try {
@@ -20,6 +21,10 @@ export const checkToken: Controller<void> = async (req, res, next) => {
       })
       return
     }
+    // 获取用户信息
+    const userInfo = await userInfoModel(token)
+    // 挂载用户信息
+    res.locals.userInfo = userInfo
     next()
   } catch (error) {
     next(error)

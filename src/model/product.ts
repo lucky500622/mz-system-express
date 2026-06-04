@@ -18,6 +18,15 @@ export const productPageActionInfoModel = async (offset: number, limit: number, 
   return res
 }
 
+// 新增产品操作信息
+export const addProductActionInfoModel = async (issue_id: string, product_id: string, action_type: number, action_num: number, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  // 拼接字段数组与值数组
+  const sql = `INSERT INTO t_product_action_info(issue_id, product_id, action_type, action_num) VALUES(?, ?, ?, ?)`
+  const [res] = await exec.query<OkPacket>(sql, [issue_id, product_id, action_type, action_num])
+  return res.affectedRows > 0
+}
+
 // 新增产品
 export const addProductModel = async (product_id: string, product_belong_id: string, product_name: string, product_type: string, product_num: number, product_description: string, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool
@@ -37,11 +46,18 @@ export const addProductModel = async (product_id: string, product_belong_id: str
   return res.affectedRows > 0
 }
 
-// 新增产品操作信息
-export const addProductActionInfoModel = async (issue_id: string, product_id: string, action_type: number, action_num?: number, connection?: any): Promise<boolean> => {
+// 获取产品信息
+export const productInfoModel = async (m_id: string, connection?: any): Promise<RowDataPacket> => {
   const exec = (connection || pool) as typeof pool
-  // 拼接字段数组与值数组
-  const sql = `INSERT INTO t_product_action_info(issue_id, product_id, action_type, action_num) VALUES(?, ?, ?, ?)`
-  const [res] = await exec.query<OkPacket>(sql, [issue_id, product_id, action_type, action_num])
+  const sql = `SELECT * FROM t_product WHERE m_id = ? AND is_delete = 0`
+  const [res] = await exec.query<RowDataPacket[]>(sql, [m_id])
+  return res[0]
+}
+
+// 删除产品
+export const deleteProductModel = async (m_id: string, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `UPDATE t_product SET is_delete = 1 WHERE m_id = ?`
+  const [res] = await exec.query<OkPacket>(sql, [m_id])
   return res.affectedRows > 0
 }

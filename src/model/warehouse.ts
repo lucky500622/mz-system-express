@@ -18,6 +18,21 @@ export const warehousePageActionInfoModel = async (offset: number, limit: number
   return res
 }
 
+// 新增仓库操作信息
+export const addWareActionInfoModel = async (issue_id: string, warehouse_id: string, action_type: number, warehouse_rename?: string, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  // 拼接字段数组与值数组
+  const fieldArr = ['issue_id', 'warehouse_id', 'action_type']
+  const valArr = [issue_id, warehouse_id, action_type]
+  if (warehouse_rename) {
+    fieldArr.push('warehouse_rename')
+    valArr.push(warehouse_rename)
+  }
+  const sql = `INSERT INTO t_warehouse_action_info(${fieldArr.join(', ')}) VALUES(${valArr.map(() => '?').join(', ')})`
+  const [res] = await exec.query<OkPacket>(sql, valArr)
+  return res.affectedRows > 0
+}
+
 // 获取仓库信息
 export const warehouseInfoModel = async (m_id: string, connection?: any): Promise<RowDataPacket> => {
   const exec = (connection || pool) as typeof pool
@@ -49,21 +64,6 @@ export const addWarehouseModel = async (warehouse_id: string, warehouse_name: st
     valArr.push(warehouse_description)
   }
   const sql = `INSERT INTO t_warehouse(${fieldArr.join(', ')}) VALUES(${valArr.map(() => '?').join(', ')})`
-  const [res] = await exec.query<OkPacket>(sql, valArr)
-  return res.affectedRows > 0
-}
-
-// 新增仓库操作信息
-export const addWareActionInfoModel = async (issue_id: string, warehouse_id: string, action_type: number, warehouse_rename?: string, connection?: any): Promise<boolean> => {
-  const exec = (connection || pool) as typeof pool
-  // 拼接字段数组与值数组
-  const fieldArr = ['issue_id', 'warehouse_id', 'action_type']
-  const valArr = [issue_id, warehouse_id, action_type]
-  if (warehouse_rename) {
-    fieldArr.push('warehouse_rename')
-    valArr.push(warehouse_rename)
-  }
-  const sql = `INSERT INTO t_warehouse_action_info(${fieldArr.join(', ')}) VALUES(${valArr.map(() => '?').join(', ')})`
   const [res] = await exec.query<OkPacket>(sql, valArr)
   return res.affectedRows > 0
 }

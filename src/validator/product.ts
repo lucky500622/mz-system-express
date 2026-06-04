@@ -22,3 +22,10 @@ export const addProductValidator = validate([
     .isString().withMessage('商品描述必须是字符串').bail()
     .isLength({ min: 0, max: 200 }).withMessage('商品描述长度必须在0-200个字符之间')
 ])
+
+// 删除产品校验
+export const deleteProductValidator = validate([
+  body('m_id')
+    .notEmpty().withMessage('商品ID不能为空').bail()
+    .isInt().withMessage('商品ID必须是整数')
+])
