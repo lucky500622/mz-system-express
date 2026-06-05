@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 import pool from '../config/db.ts'
 
-import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel } from '../model/warehouse.ts'
+import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
 // 分页获取仓库信息
@@ -88,6 +88,60 @@ export const addWarehouse: Controller<void> = async (req, res, next) => {
       code: 200,
       message: '仓库新增成功'
     })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 仓库编辑功能
+export const editWarehouse: Controller<void> = async (req, res, next) => {
+  try {
+    const connection = await pool.getConnection()
+    connection.beginTransaction()
+    try {
+      // 获取仓库信息
+      const { m_id } = req.body
+      const warehouseInfo = await warehouseInfoModel(m_id, connection)
+      if (!warehouseInfo) throw new Error('仓库不存在')
+
+      // 仓库名查重
+      const { warehouse_name } = req.body
+      const warehouse_name_isEdit = await warehouseNameCheckModel(warehouse_name, connection)
+      if (warehouse_name_isEdit) {
+        res.json({
+          code: 4011,
+          message: '仓库名已存在'
+        })
+        connection.rollback()
+        return
+      }
+
+      // 仓库编辑
+      const warehouse_isEdit = await editWarehouseModel(m_id, warehouse_name, connection)
+      if (!warehouse_isEdit) throw new Error('仓库编辑失败')
+
+      // 新增操作信息
+      const issue_id = uuidv4()
+      const issue_isAdd = await addIssueInfoModel(issue_id, res.locals.userInfo.user_id, connection)
+      if (!issue_isAdd) throw new Error('操作信息新增失败')
+
+      // 新增仓库操作信息
+      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouseInfo.warehouse_id, 3, warehouse_name, connection)
+      if (!warehouse_action_isAdd) throw new Error('仓库操作信息新增失败')
+
+      connection.commit()
+    } catch (err) {
+      connection.rollback()
+      throw err
+    } finally {
+      connection.release()
+    }
+
+    res.json({
+      code: 200,
+      message: '仓库编辑成功'
+    })
+
   } catch (err) {
     next(err)
   }

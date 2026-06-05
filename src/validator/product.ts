@@ -1,4 +1,4 @@
-import { body } from 'express-validator'
+import { body, query } from 'express-validator'
 import validate from '../middleware/validate.ts'
 
 // 新增产品校验
@@ -25,7 +25,7 @@ export const addProductValidator = validate([
 
 // 删除产品校验
 export const deleteProductValidator = validate([
-  body('m_id')
+  query('m_id')
     .notEmpty().withMessage('产品ID不能为空').bail()
     .isInt().withMessage('产品ID必须是整数')
 ])

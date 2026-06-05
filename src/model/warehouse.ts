@@ -67,3 +67,11 @@ export const addWarehouseModel = async (warehouse_id: string, warehouse_name: st
   const [res] = await exec.query<OkPacket>(sql, valArr)
   return res.affectedRows > 0
 }
+
+// 仓库编辑功能
+export const editWarehouseModel = async (m_id: string, warehouse_name: string, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `UPDATE t_warehouse SET warehouse_name = ? WHERE m_id = ?`
+  const [res] = await exec.query<OkPacket>(sql, [warehouse_name, m_id])
+  return res.affectedRows > 0
+}

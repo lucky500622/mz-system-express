@@ -15,9 +15,9 @@ router.get('/action', pageValidator, productPageActionInfo)
 router.post('/add', addProductValidator, addProduct)
 
 // 删除产品
-router.post('/delete', deleteProductValidator, deleteProduct)
+router.delete('/delete', deleteProductValidator, deleteProduct)
 
 // 调整产品数量
-router.post('/update', adjustProductNumValidator, adjustProductNum)
+router.patch('/update', adjustProductNumValidator, adjustProductNum)
 
 export default router
