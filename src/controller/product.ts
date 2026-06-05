@@ -16,7 +16,7 @@ export const productPageInfo: Controller<void> = async (req, res, next) => {
     const productInfo = await productPageInfoModel(pageOffset, pageLimit)
     res.json({
       code: 200,
-      message: '商品信息获取成功',
+      message: '产品信息获取成功',
       data: {
         productInfo
       }
@@ -35,7 +35,7 @@ export const productPageActionInfo: Controller<void> = async (req, res, next) =>
     const actionInfo = await productPageActionInfoModel(pageOffset, pageLimit)
     res.json({
       code: 200,
-      message: '商品操作信息获取成功',
+      message: '产品操作信息获取成功',
       data: {
         actionInfo
       }
@@ -63,20 +63,20 @@ export const addProduct: Controller<void> = async (req, res, next) => {
         return
       }
 
-      // 新增商品
+      // 新增产品
       const { product_name, product_type, product_num, product_description } = req.body
       const product_id = uuidv4()
       const product_isAdd = await addProductModel(product_id, warehouseInfo.warehouse_id, product_name, product_type, product_num, product_description, connection)
-      if (!product_isAdd) throw new Error('商品新增失败')
+      if (!product_isAdd) throw new Error('产品新增失败')
 
       // 新增操作信息
       const issue_id = uuidv4()
       const issue_isAdd = await addIssueInfoModel(issue_id, res.locals.userInfo.user_id, connection)
       if (!issue_isAdd) throw new Error('操作信息新增失败')
 
-      // 新增商品操作信息
+      // 新增产品操作信息
       const product_action_isAdd = await addProductActionInfoModel(issue_id, product_id, 1, product_num, connection)
-      if (!product_action_isAdd) throw new Error('商品操作信息新增失败')
+      if (!product_action_isAdd) throw new Error('产品操作信息新增失败')
 
       connection.commit()
     } catch (err) {
@@ -87,7 +87,7 @@ export const addProduct: Controller<void> = async (req, res, next) => {
     }
     res.json({
       code: 200,
-      message: '商品新增成功'
+      message: '产品新增成功'
     })
   } catch (err) {
     next(err)
@@ -114,9 +114,9 @@ export const deleteProduct: Controller<void> = async (req, res, next) => {
       const issue_isAdd = await addIssueInfoModel(issue_id, res.locals.userInfo.user_id, connection)
       if (!issue_isAdd) throw new Error('操作信息新增失败')
 
-      // 新增商品操作信息
+      // 新增产品操作信息
       const product_action_isAdd = await addProductActionInfoModel(issue_id, productInfo.product_id, 2, productInfo.product_num, connection)
-      if (!product_action_isAdd) throw new Error('商品操作信息新增失败')
+      if (!product_action_isAdd) throw new Error('产品操作信息新增失败')
 
       connection.commit()
     } catch (err) {

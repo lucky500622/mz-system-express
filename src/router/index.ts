@@ -16,7 +16,7 @@ router.use(checkToken)
 // 仓库路由
 router.use('/warehouse', warehouseRouter)
 
-// 商品路由
+// 产品路由
 router.use('/product', productRouter)
 
 export default router

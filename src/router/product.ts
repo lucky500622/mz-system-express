@@ -5,19 +5,19 @@ import { productPageInfo, productPageActionInfo, addProduct, deleteProduct, adju
 import { pageValidator } from '../validator/page.ts'
 import { addProductValidator, deleteProductValidator, adjustProductNumValidator } from '../validator/product.ts'
 
-// 分页获取商品信息
+// 分页获取产品信息
 router.get('/', pageValidator, productPageInfo)
 
-// 分页获取商品操作信息
+// 分页获取产品操作信息
 router.get('/action', pageValidator, productPageActionInfo)
 
-// 新增商品
+// 新增产品
 router.post('/add', addProductValidator, addProduct)
 
-// 删除商品
+// 删除产品
 router.post('/delete', deleteProductValidator, deleteProduct)
 
-// 调整商品数量
+// 调整产品数量
 router.post('/update', adjustProductNumValidator, adjustProductNum)
 
 export default router
