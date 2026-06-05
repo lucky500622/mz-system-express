@@ -75,7 +75,7 @@ export const addWarehouse: Controller<void> = async (req, res, next) => {
       if (!issue_isAdd) throw new Error('操作信息新增失败')
 
       // 新增仓库操作信息
-      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouse_id, 1, undefined, connection)
+      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouse_id, 1, warehouse_name, connection)
       if (!warehouse_action_isAdd) throw new Error('仓库操作信息新增失败')
 
       connection.commit()
@@ -104,6 +104,14 @@ export const editWarehouse: Controller<void> = async (req, res, next) => {
       const { m_id } = req.body
       const warehouseInfo = await warehouseInfoModel(m_id, connection)
       if (!warehouseInfo) throw new Error('仓库不存在')
+      if (warehouseInfo.warehouse_name_ed) {
+        res.json({
+          code: 4012,
+          message: '仓库名已被修改过'
+        })
+        connection.rollback()
+        return
+      }
 
       // 仓库名查重
       const { warehouse_name } = req.body
@@ -118,7 +126,7 @@ export const editWarehouse: Controller<void> = async (req, res, next) => {
       }
 
       // 仓库编辑
-      const warehouse_isEdit = await editWarehouseModel(m_id, warehouse_name, connection)
+      const warehouse_isEdit = await editWarehouseModel(m_id, warehouseInfo.warehouse_name, warehouse_name, connection)
       if (!warehouse_isEdit) throw new Error('仓库编辑失败')
 
       // 新增操作信息
@@ -127,7 +135,7 @@ export const editWarehouse: Controller<void> = async (req, res, next) => {
       if (!issue_isAdd) throw new Error('操作信息新增失败')
 
       // 新增仓库操作信息
-      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouseInfo.warehouse_id, 3, warehouseInfo.warehouse_name, connection)
+      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouseInfo.warehouse_id, 3, warehouse_name, connection)
       if (!warehouse_action_isAdd) throw new Error('仓库操作信息新增失败')
 
       connection.commit()
@@ -175,7 +183,7 @@ export const deleteWarehouse: Controller<void> = async (req, res, next) => {
       if (!issue_isAdd) throw new Error('操作信息新增失败')
 
       // 新增仓库操作信息
-      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouseInfo.warehouse_id, 2, undefined, connection)
+      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouseInfo.warehouse_id, 2, warehouseInfo.warehouse_name, connection)
       if (!warehouse_action_isAdd) throw new Error('仓库操作信息新增失败')
 
       connection.commit()
