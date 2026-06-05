@@ -101,7 +101,7 @@ export const deleteProduct: Controller<void> = async (req, res, next) => {
     connection.beginTransaction()
     try {
       // 验证产品是否存在
-      const m_id = req.query.m_id as string
+      const m_id = Number(req.query.m_id)
       const productInfo = await productInfoModel(m_id, connection)
       if (!productInfo) throw new Error('产品不存在')
 

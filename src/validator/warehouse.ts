@@ -1,4 +1,4 @@
-import { body } from 'express-validator'
+import { body, query } from 'express-validator'
 import validate from '../middleware/validate.ts'
 
 // 新增仓库校验
@@ -27,4 +27,11 @@ export const editWarehouseValidator = validate([
     .isString().withMessage('仓库名称必须是字符串').bail()
     .isLength({ min: 2, max: 20 }).withMessage('仓库名称长度必须在2-20个字符之间').bail()
     .matches(/^[\u4e00-\u9fa5a-zA-Z0-9]+$/).withMessage('仓库ID只能包含中文、字母和数字'),
+])
+
+// 删除仓库校验
+export const deleteWarehouseValidator = validate([
+  query('m_id')
+    .notEmpty().withMessage('仓库ID不能为空').bail()
+    .isInt().withMessage('仓库ID必须是整数'),
 ])

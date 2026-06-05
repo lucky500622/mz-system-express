@@ -3,7 +3,8 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 import pool from '../config/db.ts'
 
-import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel } from '../model/warehouse.ts'
+import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel, deleteWarehouseModel } from '../model/warehouse.ts'
+import { deleteWarehouseProductModel } from '../model/product.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
 // 分页获取仓库信息
@@ -126,7 +127,7 @@ export const editWarehouse: Controller<void> = async (req, res, next) => {
       if (!issue_isAdd) throw new Error('操作信息新增失败')
 
       // 新增仓库操作信息
-      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouseInfo.warehouse_id, 3, warehouse_name, connection)
+      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouseInfo.warehouse_id, 3, warehouseInfo.warehouse_name, connection)
       if (!warehouse_action_isAdd) throw new Error('仓库操作信息新增失败')
 
       connection.commit()
@@ -142,6 +143,53 @@ export const editWarehouse: Controller<void> = async (req, res, next) => {
       message: '仓库编辑成功'
     })
 
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 仓库删除功能
+export const deleteWarehouse: Controller<void> = async (req, res, next) => {
+  try {
+    const connection = await pool.getConnection()
+    connection.beginTransaction()
+    try {
+      // 获取仓库信息
+      const m_id = Number(req.query.m_id)
+      const warehouseInfo = await warehouseInfoModel(m_id, connection)
+      if (!warehouseInfo) throw new Error('仓库不存在')
+
+      // 删除仓库下的产品
+      if (warehouseInfo.product_num) {
+        const product_isDelete = await deleteWarehouseProductModel(warehouseInfo.warehouse_id, connection)
+        if (!product_isDelete) throw new Error('仓库下产品删除失败')
+      }
+
+      // 删除仓库
+      const warehouse_isDelete = await deleteWarehouseModel(m_id, connection)
+      if (!warehouse_isDelete) throw new Error('仓库删除失败')
+
+      // 新增操作信息
+      const issue_id = uuidv4()
+      const issue_isAdd = await addIssueInfoModel(issue_id, res.locals.userInfo.user_id, connection)
+      if (!issue_isAdd) throw new Error('操作信息新增失败')
+
+      // 新增仓库操作信息
+      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouseInfo.warehouse_id, 2, undefined, connection)
+      if (!warehouse_action_isAdd) throw new Error('仓库操作信息新增失败')
+
+      connection.commit()
+    } catch (err) {
+      connection.rollback()
+      throw err
+    } finally {
+      connection.release()
+    }
+
+    res.json({
+      code: 200,
+      message: '仓库删除成功'
+    })
   } catch (err) {
     next(err)
   }

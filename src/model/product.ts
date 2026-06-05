@@ -47,7 +47,7 @@ export const addProductModel = async (product_id: string, product_belong_id: str
 }
 
 // 获取产品信息
-export const productInfoModel = async (m_id: string, connection?: any): Promise<RowDataPacket> => {
+export const productInfoModel = async (m_id: number, connection?: any): Promise<RowDataPacket> => {
   const exec = (connection || pool) as typeof pool
   const sql = `SELECT * FROM t_product WHERE m_id = ? AND is_delete = 0`
   const [res] = await exec.query<RowDataPacket[]>(sql, [m_id])
@@ -55,15 +55,23 @@ export const productInfoModel = async (m_id: string, connection?: any): Promise<
 }
 
 // 删除产品
-export const deleteProductModel = async (m_id: string, connection?: any): Promise<boolean> => {
+export const deleteProductModel = async (m_id: number, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool
   const sql = `UPDATE t_product SET is_delete = 1 WHERE m_id = ?`
   const [res] = await exec.query<OkPacket>(sql, [m_id])
   return res.affectedRows > 0
 }
 
+// 删除仓库下所属全部产品
+export const deleteWarehouseProductModel = async (warehouse_id: string, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `UPDATE t_product SET is_delete = 1 WHERE product_belong_id = ?`
+  const [res] = await exec.query<OkPacket>(sql, [warehouse_id])
+  return res.affectedRows > 0
+}
+
 // 调整产品数量
-export const adjustProductNumModel = async (m_id: string, product_num: number, connection?: any): Promise<boolean> => {
+export const adjustProductNumModel = async (m_id: number, product_num: number, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool
   const sql = `UPDATE t_product SET product_num = ? WHERE m_id = ?`
   const [res] = await exec.query<OkPacket>(sql, [product_num, m_id])
