@@ -1,6 +1,18 @@
 import { body, query } from 'express-validator'
 import validate from '../middleware/validate.ts'
 
+// 产品查询校验
+export const productInfoValidator = validate([
+  query('m_id').optional()
+    .isInt().withMessage('产品ID必须是整数'),
+  query('product_name').optional()
+    .isString().withMessage('产品名称必须是字符串'),
+  query('product_type').optional()
+    .isString().withMessage('产品类型必须是字符串'),
+  query('warehouse_m_id').optional()
+    .isInt().withMessage('产品所属仓库ID必须是整数')
+])
+
 // 新增产品校验
 export const addProductValidator = validate([
   body('m_id')

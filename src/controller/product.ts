@@ -10,10 +10,10 @@ import { addIssueInfoModel } from '../model/issue.ts'
 // 分页获取产品信息
 export const productPageInfo: Controller<void> = async (req, res, next) => {
   try {
-    const { offset = 0, limit = 10 } = req.query
+    const { offset = 0, limit = 10, m_id, product_name, product_type, warehouse_m_id } = req.query
     const pageOffset = Number(offset)
     const pageLimit = Number(limit)
-    const productInfo = await productPageInfoModel(pageOffset, pageLimit)
+    const productInfo = await productPageInfoModel(pageOffset, pageLimit, Number(m_id), String(product_name || ''), String(product_type || ''), Number(warehouse_m_id))
     res.json({
       code: 200,
       message: '产品信息获取成功',

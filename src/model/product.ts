@@ -3,10 +3,30 @@ import { RowDataPacket, OkPacket } from 'mysql2'
 import pool from '../config/db.ts'
 
 // 分页获取产品信息
-export const productPageInfoModel = async (offset: number, limit: number, connection?: any): Promise<RowDataPacket[]> => {
+export const productPageInfoModel = async (offset: number, limit: number, m_id?: number, product_name?: string, product_type?: string, warehouse_m_id?: number, connection?: any): Promise<RowDataPacket[]> => {
   const exec = (connection || pool) as typeof pool
-  const sql = 'SELECT t_product.m_id, t_warehouse.m_id AS warehouse_m_id, product_name, product_type, product_num, product_description FROM t_product INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id WHERE t_product.is_delete = 0 AND t_warehouse.is_delete = 0 ORDER BY t_product.m_id DESC LIMIT ?, ?'
-  const [res] = await exec.query<RowDataPacket[]>(sql, [offset, limit])
+  // 拼接字段数组与值数组
+  const fieldArr = []
+  const valArr = []
+  if (m_id) {
+    fieldArr.push('t_product.m_id = ?')
+    valArr.push(m_id)
+  }
+  if (product_name) {
+    fieldArr.push('t_product.product_name LIKE ?')
+    valArr.push(`%${product_name}%`)
+  }
+  if (product_type) {
+    fieldArr.push('t_product.product_type LIKE ?')
+    valArr.push(`%${product_type}%`)
+  }
+  if (warehouse_m_id) {
+    fieldArr.push('t_warehouse.m_id = ?')
+    valArr.push(warehouse_m_id)
+  }
+  const where = fieldArr.length > 0 ? 'AND ' : ''
+  const sql = `SELECT t_product.m_id, t_warehouse.m_id AS warehouse_m_id, product_name, product_type, product_num, product_description FROM t_product INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id WHERE t_product.is_delete = 0 AND t_warehouse.is_delete = 0 ${where}${fieldArr.join(' AND ')} ORDER BY t_product.m_id DESC LIMIT ?, ?`
+  const [res] = await exec.query<RowDataPacket[]>(sql, [...valArr, offset, limit])
   return res
 }
 
