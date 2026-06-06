@@ -1,6 +1,18 @@
 import { body, query } from 'express-validator'
 import validate from '../middleware/validate.ts'
 
+// 查询仓库校验
+export const warehouseInfoValidator = validate([
+  query('m_id').optional()
+    .isInt().withMessage('仓库ID必须是整数'),
+  query('warehouse_name').optional()
+    .isString().withMessage('仓库名称必须是字符串'),
+  query('warehouse_type').optional()
+    .isString().withMessage('仓库类型必须是字符串'),
+  query('user_name').optional()
+    .isString().withMessage('用户名称必须是字符串')
+])
+
 // 新增仓库校验
 export const addWarehouseValidator = validate([
   body('warehouse_name')

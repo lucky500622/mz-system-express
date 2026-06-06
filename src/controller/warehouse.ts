@@ -10,10 +10,10 @@ import { addIssueInfoModel } from '../model/issue.ts'
 // 分页获取仓库信息
 export const warehousePageInfo: Controller<void> = async (req, res, next) => {
   try {
-    const { offset = 0, limit = 10 } = req.query
+    const { offset = 0, limit = 10, m_id, warehouse_name, warehouse_type, user_name } = req.query
     const pageOffset = Number(offset)
     const pageLimit = Number(limit)
-    const warehouseInfo = await warehousePageInfoModel(pageOffset, pageLimit)
+    const warehouseInfo = await warehousePageInfoModel(pageOffset, pageLimit, Number(m_id), String(warehouse_name || ''), String(warehouse_type || ''), String(user_name || ''))
     res.json({
       code: 200,
       message: '仓库信息获取成功',

@@ -3,11 +3,11 @@ const router = express.Router()
 
 import { warehousePageInfo, warehousePageActionInfo, addWarehouse, editWarehouse, deleteWarehouse } from '../controller/warehouse.ts'
 import { pageValidator } from '../validator/page.ts'
-import { addWarehouseValidator, editWarehouseValidator, deleteWarehouseValidator } from '../validator/warehouse.ts'
+import { addWarehouseValidator, editWarehouseValidator, deleteWarehouseValidator, warehouseInfoValidator } from '../validator/warehouse.ts'
 
 
 // 分页获取仓库信息
-router.get('/', pageValidator, warehousePageInfo)
+router.get('/', pageValidator, warehouseInfoValidator, warehousePageInfo)
 
 // 分页获取仓库操作信息
 router.get('/action', pageValidator, warehousePageActionInfo)
