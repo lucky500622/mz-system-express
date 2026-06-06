@@ -31,10 +31,34 @@ export const productPageInfoModel = async (offset: number, limit: number, m_id?:
 }
 
 // 分页获取产品操作信息
-export const productPageActionInfoModel = async (offset: number, limit: number, connection?: any): Promise<RowDataPacket[]> => {
+export const productPageActionInfoModel = async (offset: number, limit: number, m_id?: number, product_m_id?: number, product_name?: string, action_type?: number, user_name?: string, connection?: any): Promise<RowDataPacket[]> => {
   const exec = (connection || pool) as typeof pool
-  const sql = 'SELECT t_issue_info.m_id, t_product.m_id AS product_m_id, issue_create_time, user_name, product_name, action_type, action_num FROM t_issue_info INNER JOIN t_product_action_info ON t_issue_info.issue_id = t_product_action_info.issue_id INNER JOIN t_product ON t_product_action_info.product_id = t_product.product_id INNER JOIN t_user ON t_issue_info.user_id = t_user.user_id ORDER BY t_issue_info.m_id DESC LIMIT ?, ?'
-  const [res] = await exec.query<RowDataPacket[]>(sql, [offset, limit])
+  // 拼接字段数组与值数组
+  const fieldArr = []
+  const valArr = []
+  if (m_id) {
+    fieldArr.push('t_issue_info.m_id = ?')
+    valArr.push(m_id)
+  }
+  if (product_m_id) {
+    fieldArr.push('t_product.m_id = ?')
+    valArr.push(product_m_id)
+  }
+  if (product_name) {
+    fieldArr.push('t_product.product_name LIKE ?')
+    valArr.push(`%${product_name}%`)
+  }
+  if (action_type) {
+    fieldArr.push('t_product_action_info.action_type = ?')
+    valArr.push(action_type)
+  }
+  if (user_name) {
+    fieldArr.push('t_user.user_name LIKE ?')
+    valArr.push(`%${user_name}%`)
+  }
+  const where = fieldArr.length > 0 ? 'WHERE ' : ''
+  const sql = `SELECT t_issue_info.m_id, t_product.m_id AS product_m_id, issue_create_time, user_name, product_name, action_type, action_num FROM t_issue_info INNER JOIN t_product_action_info ON t_issue_info.issue_id = t_product_action_info.issue_id INNER JOIN t_product ON t_product_action_info.product_id = t_product.product_id INNER JOIN t_user ON t_issue_info.user_id = t_user.user_id ${where}${fieldArr.join(' AND ')} ORDER BY t_issue_info.m_id DESC LIMIT ?, ?`
+  const [res] = await exec.query<RowDataPacket[]>(sql, [...valArr, offset, limit])
   return res
 }
 

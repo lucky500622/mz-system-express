@@ -3,13 +3,13 @@ const router = express.Router()
 
 import { productPageInfo, productPageActionInfo, addProduct, deleteProduct, adjustProductNum } from '../controller/product.ts'
 import { pageValidator } from '../validator/page.ts'
-import { addProductValidator, deleteProductValidator, adjustProductNumValidator, productInfoValidator } from '../validator/product.ts'
+import { addProductValidator, deleteProductValidator, adjustProductNumValidator, productInfoValidator, productActionInfoValidator } from '../validator/product.ts'
 
 // 分页获取产品信息
 router.get('/', pageValidator, productInfoValidator, productPageInfo)
 
 // 分页获取产品操作信息
-router.get('/action', pageValidator, productPageActionInfo)
+router.get('/action', pageValidator, productActionInfoValidator, productPageActionInfo)
 
 // 新增产品
 router.post('/add', addProductValidator, addProduct)

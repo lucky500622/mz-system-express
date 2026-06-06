@@ -13,6 +13,20 @@ export const productInfoValidator = validate([
     .isInt().withMessage('产品所属仓库ID必须是整数')
 ])
 
+// 产品操作信息查询校验
+export const productActionInfoValidator = validate([
+  query('m_id').optional()
+    .isInt().withMessage('产品ID必须是整数'),
+  query('product_m_id').optional()
+    .isInt().withMessage('产品ID必须是整数'),
+  query('product_name').optional()
+    .isString().withMessage('产品名称必须是字符串'),
+  query('action_type').optional()
+    .isInt().withMessage('操作类型必须是整数'),
+  query('user_name').optional()
+    .isString().withMessage('用户名称必须是字符串')
+])
+
 // 新增产品校验
 export const addProductValidator = validate([
   body('m_id')

@@ -29,10 +29,10 @@ export const productPageInfo: Controller<void> = async (req, res, next) => {
 // 分页获取产品操作信息
 export const productPageActionInfo: Controller<void> = async (req, res, next) => {
   try {
-    const { offset = 0, limit = 10 } = req.query
+    const { offset = 0, limit = 10, m_id, product_m_id, product_name, action_type, user_name } = req.query
     const pageOffset = Number(offset)
     const pageLimit = Number(limit)
-    const actionInfo = await productPageActionInfoModel(pageOffset, pageLimit)
+    const actionInfo = await productPageActionInfoModel(pageOffset, pageLimit, Number(m_id), Number(product_m_id), String(product_name || ''), Number(action_type), String(user_name || ''))
     res.json({
       code: 200,
       message: '产品操作信息获取成功',
