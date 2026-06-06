@@ -13,6 +13,20 @@ export const warehouseInfoValidator = validate([
     .isString().withMessage('用户名称必须是字符串')
 ])
 
+// 查询仓库操作信息校验
+export const warehouseActionInfoValidator = validate([
+  query('m_id').optional()
+    .isInt().withMessage('仓库ID必须是整数'),
+  query('warehouse_m_id').optional()
+    .isInt().withMessage('仓库ID必须是整数'),
+  query('warehouse_name').optional()
+    .isString().withMessage('仓库名称必须是字符串'),
+  query('action_type').optional()
+    .isInt().withMessage('操作类型必须是整数'),
+  query('user_name').optional()
+    .isString().withMessage('用户名称必须是字符串')
+])
+
 // 新增仓库校验
 export const addWarehouseValidator = validate([
   body('warehouse_name')
