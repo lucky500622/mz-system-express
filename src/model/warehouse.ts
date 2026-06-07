@@ -128,3 +128,11 @@ export const deleteWarehouseModel = async (m_id: number, connection?: any): Prom
   const [res] = await exec.query<OkPacket>(sql, [m_id])
   return res.affectedRows > 0
 }
+
+// 获取仓库名
+export const warehouseNameModel = async (text: string, limit: number, connection?: any): Promise<RowDataPacket[]> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'SELECT warehouse_name AS name FROM t_warehouse WHERE is_delete = 0 AND warehouse_name LIKE ? LIMIT ?'
+  const [res] = await exec.query<RowDataPacket[]>(sql, [`%${text}%`, limit])
+  return res
+}

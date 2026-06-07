@@ -129,3 +129,11 @@ export const editProductDescriptionModel = async (m_id: number, product_descript
   const [res] = await exec.query<OkPacket>(sql, [product_description, m_id])
   return res.affectedRows > 0
 }
+
+// 获取产品名称
+export const productNameModel = async (text: string, limit: number, connection?: any): Promise<RowDataPacket[]> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `SELECT product_name AS name FROM t_product WHERE product_name LIKE ? AND is_delete = 0 ORDER BY RAND() LIMIT ?`
+  const [res] = await exec.query<RowDataPacket[]>(sql, [`%${text}%`, limit])
+  return res
+}

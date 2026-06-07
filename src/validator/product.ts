@@ -79,3 +79,12 @@ export const editProductDescriptionValidator = validate([
     .isString().withMessage('产品描述必须是字符串').bail()
     .isLength({ min: 0, max: 200 }).withMessage('产品描述长度必须在0-200个字符之间')
 ])
+
+// 获取产品名称校验
+export const productNameValidator = validate([
+  query('text')
+    .notEmpty().withMessage('搜索文本不能为空').bail()
+    .isString().withMessage('搜索文本必须是字符串'),
+  query('limit').optional()
+    .isInt({ min: 1, max: 100 }).withMessage('限制数量必须在1-100之间')
+])

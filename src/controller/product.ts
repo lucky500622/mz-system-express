@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 
 import pool from '../config/db.ts'
-import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel } from '../model/product.ts'
+import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel, productNameModel } from '../model/product.ts'
 import { warehouseInfoModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -242,6 +242,25 @@ export const editProductDescription: Controller<void> = async (req, res, next) =
     res.json({
       code: 200,
       message: '产品描述编辑成功'
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 获取产品名称
+export const getProductName: Controller<void> = async (req, res, next) => {
+  try {
+    // 获取产品名
+    const { text, limit = 10 } = req.query
+    const productName = await productNameModel(String(text || ''), Number(limit))
+
+    res.json({
+      code: 200,
+      message: '产品名获取成功',
+      data: {
+        name: productName
+      }
     })
   } catch (err) {
     next(err)

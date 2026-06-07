@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 import pool from '../config/db.ts'
 
-import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel, deleteWarehouseModel, editWarehouseDescriptionModel } from '../model/warehouse.ts'
+import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel, deleteWarehouseModel, editWarehouseDescriptionModel, warehouseNameModel } from '../model/warehouse.ts'
 import { deleteWarehouseProductModel } from '../model/product.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -111,7 +111,7 @@ export const addWarehouse: Controller<void> = async (req, res, next) => {
   }
 }
 
-// 仓库编辑功能
+// 仓库编辑
 export const editWarehouse: Controller<void> = async (req, res, next) => {
   try {
     const connection = await pool.getConnection()
@@ -173,7 +173,7 @@ export const editWarehouse: Controller<void> = async (req, res, next) => {
   }
 }
 
-// 仓库描述编辑功能
+// 仓库描述编辑
 export const editWarehouseDescription: Controller<void> = async (req, res, next) => {
   try {
     const connection = await pool.getConnection()
@@ -207,7 +207,7 @@ export const editWarehouseDescription: Controller<void> = async (req, res, next)
   }
 }
 
-// 仓库删除功能
+// 仓库删除
 export const deleteWarehouse: Controller<void> = async (req, res, next) => {
   try {
     const connection = await pool.getConnection()
@@ -256,6 +256,25 @@ export const deleteWarehouse: Controller<void> = async (req, res, next) => {
     res.json({
       code: 200,
       message: '仓库删除成功'
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 仓库名获取
+export const getWarehouseName: Controller<void> = async (req, res, next) => {
+  try {
+    // 获取仓库名
+    const { text, limit = 10 } = req.query
+    const warehouseName = await warehouseNameModel(String(text || ''), Number(limit))
+
+    res.json({
+      code: 200,
+      message: '仓库名获取成功',
+      data: {
+        name: warehouseName
+      }
     })
   } catch (err) {
     next(err)
