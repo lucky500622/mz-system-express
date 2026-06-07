@@ -27,6 +27,13 @@ export const warehouseActionInfoValidator = validate([
     .isString().withMessage('用户名称必须是字符串')
 ])
 
+// 查询某个仓库信息校验
+export const oneWarehouseInfoValidator = validate([
+  query('m_id')
+    .notEmpty().withMessage('仓库ID不能为空').bail()
+    .isInt().withMessage('仓库ID必须是整数')
+])
+
 // 新增仓库校验
 export const addWarehouseValidator = validate([
   body('warehouse_name')

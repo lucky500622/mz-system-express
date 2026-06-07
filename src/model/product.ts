@@ -25,7 +25,7 @@ export const productPageInfoModel = async (offset: number, limit: number, m_id?:
     valArr.push(warehouse_m_id)
   }
   const where = fieldArr.length > 0 ? 'AND ' : ''
-  const sql = `SELECT t_product.m_id, t_warehouse.m_id AS warehouse_m_id, product_name, product_type, product_num, product_description FROM t_product INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id WHERE t_product.is_delete = 0 AND t_warehouse.is_delete = 0 ${where}${fieldArr.join(' AND ')} ORDER BY t_product.m_id DESC LIMIT ?, ?`
+  const sql = `SELECT t_product.m_id, t_warehouse.m_id AS warehouse_m_id, product_name, product_type, product_num, product_list_num, product_diff_num, product_description FROM t_product INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id WHERE t_product.is_delete = 0 AND t_warehouse.is_delete = 0 ${where}${fieldArr.join(' AND ')} ORDER BY t_product.m_id DESC LIMIT ?, ?`
   const [res] = await exec.query<RowDataPacket[]>(sql, [...valArr, offset, limit])
   return res
 }

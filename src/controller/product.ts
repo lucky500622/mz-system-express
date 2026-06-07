@@ -104,6 +104,14 @@ export const deleteProduct: Controller<void> = async (req, res, next) => {
       const m_id = Number(req.query.m_id)
       const productInfo = await productInfoModel(m_id, connection)
       if (!productInfo) throw new Error('产品不存在')
+      if (productInfo.product_list_num) {
+        res.json({
+          code: 4023,
+          message: '产品已上架，不能删除'
+        })
+        connection.rollback()
+        return
+      }
 
       // 删除产品
       const product_isDelete = await deleteProductModel(m_id, connection)
@@ -149,13 +157,23 @@ export const adjustProductNum: Controller<void> = async (req, res, next) => {
 
       // 校验库存是否充足
       const { action_type, product_num } = req.body
-      if (action_type === 4 && productInfo.product_num < product_num) {
-        res.json({
-          code: 4022,
-          message: '库存不足'
-        })
-        connection.rollback()
-        return
+      if (action_type === 4) {
+        if (productInfo.product_num < product_num) {
+          res.json({
+            code: 4022,
+            message: '库存不足'
+          })
+          connection.rollback()
+          return
+        }
+        if (productInfo.product_list_num && productInfo.product_diff_num < product_num) {
+          res.json({
+            code: 4022,
+            message: '库存不足'
+          })
+          connection.rollback()
+          return
+        }
       }
 
       // 调整产品数量

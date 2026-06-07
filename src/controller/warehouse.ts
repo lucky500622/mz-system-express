@@ -45,6 +45,23 @@ export const warehousePageActionInfo: Controller<void> = async (req, res, next) 
   }
 }
 
+// 获取仓库信息
+export const warehouseInfo: Controller<void> = async (req, res, next) => {
+  try {
+    const { m_id } = req.query
+    const warehouseInfo = await warehouseInfoModel(Number(m_id))
+    res.json({
+      code: 200,
+      message: '仓库信息获取成功',
+      data: {
+        warehouseInfo
+      }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
 // 新增仓库
 export const addWarehouse: Controller<void> = async (req, res, next) => {
   try {
@@ -166,6 +183,14 @@ export const deleteWarehouse: Controller<void> = async (req, res, next) => {
       const m_id = Number(req.query.m_id)
       const warehouseInfo = await warehouseInfoModel(m_id, connection)
       if (!warehouseInfo) throw new Error('仓库不存在')
+      if (warehouseInfo.exists_list_product) {
+        res.json({
+          code: 4013,
+          message: '仓库下存在产品，不能删除'
+        })
+        connection.rollback()
+        return
+      }
 
       // 删除仓库下的产品
       if (warehouseInfo.product_num) {
