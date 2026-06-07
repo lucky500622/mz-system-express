@@ -185,9 +185,9 @@ export const editWarehouseDescription: Controller<void> = async (req, res, next)
       if (!warehouseInfo) throw new Error('仓库不存在')
 
       // 仓库描述编辑
-      const { warehouse_description } = req.body
-      const description = `${warehouse_description} --- ${res.locals.userInfo.user_name}`
-      const warehouse_isEdit = await editWarehouseDescriptionModel(m_id, description, connection)
+      const { description } = req.body
+      const warehouse_description = `${description} --- ${res.locals.userInfo.user_name}`
+      const warehouse_isEdit = await editWarehouseDescriptionModel(m_id, warehouse_description, connection)
       if (!warehouse_isEdit) throw new Error('仓库描述编辑失败')
 
       connection.commit()

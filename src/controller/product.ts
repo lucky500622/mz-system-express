@@ -226,9 +226,9 @@ export const editProductDescription: Controller<void> = async (req, res, next) =
       if (!productInfo) throw new Error('产品不存在')
 
       // 编辑产品描述
-      const { product_description } = req.body
-      const description = `${product_description} --- ${res.locals.userInfo.user_name}`
-      const product_isUpdate = await editProductDescriptionModel(m_id, description, connection)
+      const { description } = req.body
+      const product_description = `${description} --- ${res.locals.userInfo.user_name}`
+      const product_isUpdate = await editProductDescriptionModel(m_id, product_description, connection)
       if (!product_isUpdate) throw new Error('产品描述编辑失败')
 
       connection.commit()

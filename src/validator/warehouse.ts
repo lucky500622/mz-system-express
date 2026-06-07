@@ -67,7 +67,7 @@ export const editWarehouseDescriptionValidator = validate([
   body('m_id')
     .notEmpty().withMessage('仓库序列号不能为空').bail()
     .isInt().withMessage('仓库序列号必须是整数'),
-  body('warehouse_description')
+  body('description')
     .notEmpty().withMessage('仓库描述不能为空').bail()
     .isString().withMessage('仓库描述必须是字符串').bail()
     .isLength({ min: 0, max: 200 }).withMessage('仓库描述长度必须在0-200个字符之间')

@@ -74,7 +74,7 @@ export const editProductDescriptionValidator = validate([
   body('m_id')
     .notEmpty().withMessage('产品序列号不能为空').bail()
     .isInt().withMessage('产品序列号必须是整数'),
-  body('product_description')
+  body('description')
     .notEmpty().withMessage('产品描述不能为空').bail()
     .isString().withMessage('产品描述必须是字符串').bail()
     .isLength({ min: 0, max: 200 }).withMessage('产品描述长度必须在0-200个字符之间')
