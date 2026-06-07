@@ -113,6 +113,14 @@ export const editWarehouseModel = async (m_id: number, warehouse_name_ed: string
   return res.affectedRows > 0
 }
 
+// 仓库描述编辑功能
+export const editWarehouseDescriptionModel = async (m_id: number, warehouse_description: string, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `UPDATE t_warehouse SET warehouse_description = ? WHERE m_id = ?`
+  const [res] = await exec.query<OkPacket>(sql, [warehouse_description, m_id])
+  return res.affectedRows > 0
+}
+
 // 仓库删除功能
 export const deleteWarehouseModel = async (m_id: number, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool

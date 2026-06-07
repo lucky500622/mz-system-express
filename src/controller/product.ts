@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 
 import pool from '../config/db.ts'
-import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel } from '../model/product.ts'
+import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel } from '../model/product.ts'
 import { warehouseInfoModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -208,6 +208,40 @@ export const adjustProductNum: Controller<void> = async (req, res, next) => {
       data: {
         endNum: endNum
       }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 编辑产品描述
+export const editProductDescription: Controller<void> = async (req, res, next) => {
+  try {
+    const connection = await pool.getConnection()
+    connection.beginTransaction()
+    try {
+      // 获取产品信息
+      const { m_id } = req.body
+      const productInfo = await productInfoModel(m_id, connection)
+      if (!productInfo) throw new Error('产品不存在')
+
+      // 编辑产品描述
+      const { product_description } = req.body
+      const description = `${product_description} --- ${res.locals.userInfo.user_name}`
+      const product_isUpdate = await editProductDescriptionModel(m_id, description, connection)
+      if (!product_isUpdate) throw new Error('产品描述编辑失败')
+
+      connection.commit()
+    } catch (err) {
+      connection.rollback()
+      throw err
+    } finally {
+      connection.release()
+    }
+
+    res.json({
+      code: 200,
+      message: '产品描述编辑成功'
     })
   } catch (err) {
     next(err)

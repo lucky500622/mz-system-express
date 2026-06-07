@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 import pool from '../config/db.ts'
 
-import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel, deleteWarehouseModel } from '../model/warehouse.ts'
+import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel, deleteWarehouseModel, editWarehouseDescriptionModel } from '../model/warehouse.ts'
 import { deleteWarehouseProductModel } from '../model/product.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -168,6 +168,40 @@ export const editWarehouse: Controller<void> = async (req, res, next) => {
       message: '仓库编辑成功'
     })
 
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 仓库描述编辑功能
+export const editWarehouseDescription: Controller<void> = async (req, res, next) => {
+  try {
+    const connection = await pool.getConnection()
+    connection.beginTransaction()
+    try {
+      // 获取仓库信息
+      const { m_id } = req.body
+      const warehouseInfo = await warehouseInfoModel(m_id, connection)
+      if (!warehouseInfo) throw new Error('仓库不存在')
+
+      // 仓库描述编辑
+      const { warehouse_description } = req.body
+      const description = `${warehouse_description} --- ${res.locals.userInfo.user_name}`
+      const warehouse_isEdit = await editWarehouseDescriptionModel(m_id, description, connection)
+      if (!warehouse_isEdit) throw new Error('仓库描述编辑失败')
+
+      connection.commit()
+    } catch (err) {
+      connection.rollback()
+      throw err
+    } finally {
+      connection.release()
+    }
+
+    res.json({
+      code: 200,
+      message: '仓库描述编辑成功'
+    })
   } catch (err) {
     next(err)
   }
