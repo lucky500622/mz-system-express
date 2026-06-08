@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 import pool from '../config/db.ts'
 
-import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel, deleteWarehouseModel, editWarehouseDescriptionModel, warehouseNameModel, handleWarehouseModel } from '../model/warehouse.ts'
+import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel, deleteWarehouseModel, editWarehouseDescriptionModel, warehouseNameModel, handleWarehouseModel, addHandleWarehouseModel } from '../model/warehouse.ts'
 import { deleteWarehouseProductModel } from '../model/product.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -241,6 +241,14 @@ export const deleteWarehouse: Controller<void> = async (req, res, next) => {
         connection.rollback()
         return
       }
+      if (warehouseInfo.exists_user_handle) {
+        res.json({
+          code: 4014,
+          message: '仓库已被经手，不能删除'
+        })
+        connection.rollback()
+        return
+      }
 
       // 删除仓库下的产品
       if (warehouseInfo.product_num) {
@@ -291,6 +299,31 @@ export const getWarehouseName: Controller<void> = async (req, res, next) => {
       data: {
         name: warehouseName
       }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 添加经手仓库
+export const addHandleWarehouse: Controller<void> = async (req, res, next) => {
+  try {
+    const connection = await pool.getConnection()
+    connection.beginTransaction()
+    try {
+      // 获取仓库信息
+
+      connection.commit()
+    } catch (err) {
+      connection.rollback()
+      throw err
+    } finally {
+      connection.release()
+    }
+
+    res.json({
+      code: 200,
+      message: '仓库添加成功'
     })
   } catch (err) {
     next(err)
