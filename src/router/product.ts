@@ -15,7 +15,7 @@ router.get('/action', pageValidator, productActionInfoValidator, productPageActi
 router.post('/add', addProductValidator, addProduct)
 
 // 删除产品
-router.delete('/delete', deleteProductValidator, deleteProduct)
+router.patch('/delete', deleteProductValidator, deleteProduct)
 
 // 调整产品数量
 router.patch('/update', adjustProductNumValidator, adjustProductNum)

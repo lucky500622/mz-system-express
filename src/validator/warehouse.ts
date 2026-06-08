@@ -88,3 +88,10 @@ export const randomWarehouseNameValidator = validate([
   query('limit').optional()
     .isInt({ min: 1, max: 100 }).withMessage('限制数量必须在1-100之间')
 ])
+
+// 新增经手仓库校验
+export const addHandleWarehouseValidator = validate([
+  body('m_id')
+    .notEmpty().withMessage('仓库序列号不能为空').bail()
+    .isInt().withMessage('仓库序列号必须是整数'),
+])

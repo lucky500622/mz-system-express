@@ -312,6 +312,29 @@ export const addHandleWarehouse: Controller<void> = async (req, res, next) => {
     connection.beginTransaction()
     try {
       // 获取仓库信息
+      const { m_id } = req.body
+      const warehouseInfo = await warehouseInfoModel(m_id, connection)
+      if (!warehouseInfo) {
+        res.json({
+          code: 4015,
+          message: '仓库不存在'
+        })
+        connection.rollback()
+        return
+      }
+      if (warehouseInfo.exists_user_handle) {
+        res.json({
+          code: 4014,
+          message: '仓库已被经手，不能添加'
+        })
+        connection.rollback()
+        return
+      }
+
+      // 新增经手仓库
+      const warehouse_user_id = res.locals.userInfo.user_id
+      const warehouse_isAdd = await addHandleWarehouseModel(m_id, warehouse_user_id, connection)
+      if (!warehouse_isAdd) throw new Error('仓库添加失败')
 
       connection.commit()
     } catch (err) {
@@ -323,7 +346,7 @@ export const addHandleWarehouse: Controller<void> = async (req, res, next) => {
 
     res.json({
       code: 200,
-      message: '仓库添加成功'
+      message: '经手仓库仓库添加成功'
     })
   } catch (err) {
     next(err)
