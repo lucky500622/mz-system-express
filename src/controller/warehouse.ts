@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 import pool from '../config/db.ts'
 
-import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel, deleteWarehouseModel, editWarehouseDescriptionModel, warehouseNameModel } from '../model/warehouse.ts'
+import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel, addWareActionInfoModel, warehouseNameCheckModel, editWarehouseModel, warehouseInfoModel, deleteWarehouseModel, editWarehouseDescriptionModel, warehouseNameModel, handleWarehouseModel } from '../model/warehouse.ts'
 import { deleteWarehouseProductModel } from '../model/product.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -38,6 +38,22 @@ export const warehousePageActionInfo: Controller<void> = async (req, res, next) 
       message: '仓库操作信息获取成功',
       data: {
         actionInfo
+      }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 获取经手的仓库信息
+export const handleWarehouse: Controller<void> = async (req, res, next) => {
+  try {
+    const handleWarehouseInfo = await handleWarehouseModel(res.locals.userInfo.user_id)
+    res.json({
+      code: 200,
+      message: '经手的仓库信息获取成功',
+      data: {
+        handleWarehouseInfo
       }
     })
   } catch (err) {

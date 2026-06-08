@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 
-import { warehousePageInfo, warehousePageActionInfo, addWarehouse, editWarehouse, deleteWarehouse, warehouseInfo, editWarehouseDescription, getWarehouseName } from '../controller/warehouse.ts'
+import { warehousePageInfo, warehousePageActionInfo, addWarehouse, editWarehouse, deleteWarehouse, warehouseInfo, editWarehouseDescription, getWarehouseName, handleWarehouse } from '../controller/warehouse.ts'
 import { pageValidator } from '../validator/page.ts'
 import { addWarehouseValidator, editWarehouseValidator, deleteWarehouseValidator, warehouseInfoValidator, warehouseActionInfoValidator, oneWarehouseInfoValidator, editWarehouseDescriptionValidator, randomWarehouseNameValidator } from '../validator/warehouse.ts'
 
@@ -29,5 +29,8 @@ router.delete('/delete', deleteWarehouseValidator, deleteWarehouse)
 
 // 获取仓库名
 router.get('/name', randomWarehouseNameValidator, getWarehouseName)
+
+// 获取经手的仓库信息
+router.get('/handle', handleWarehouse)
 
 export default router

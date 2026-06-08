@@ -24,8 +24,8 @@ export const warehousePageInfoModel = async (offset: number, limit: number, m_id
     fieldArr.push('user_name LIKE ?')
     valArr.push(`%${user_name}%`)
   }
-  const where = fieldArr.length > 0 ? 'AND ' : ''
-  const sql = `SELECT t_warehouse.m_id, warehouse_name_ed, warehouse_name, warehouse_type, user_name, warehouse_description, IF(MAX(product_list_num) = 0 OR MAX(product_list_num) IS NULL, 0, 1) AS exists_list_product, warehouse_create_time FROM t_warehouse INNER JOIN t_user ON t_warehouse.warehouse_creater_id = t_user.user_id LEFT OUTER JOIN t_product ON warehouse_id = product_belong_id AND t_product.is_delete = 0 WHERE t_warehouse.is_delete = 0 ${where}${fieldArr.join(' AND ')} GROUP BY t_warehouse.m_id ORDER BY m_id DESC LIMIT ?, ?`
+  const where = fieldArr.length > 0 ? ' WHERE ' : ''
+  const sql = `SELECT t_warehouse.m_id, warehouse_name_ed, warehouse_name, warehouse_type, user_name, warehouse_description, IF(MAX(product_list_num) = 0 OR MAX(product_list_num) IS NULL, 0, 1) AS exists_list_product, warehouse_create_time, warehouse_user_id FROM t_warehouse INNER JOIN t_user ON t_warehouse.warehouse_creater_id = t_user.user_id AND t_warehouse.is_delete = 0 LEFT OUTER JOIN t_product ON warehouse_id = product_belong_id AND t_product.is_delete = 0${where}${fieldArr.join(' AND ')} GROUP BY t_warehouse.m_id ORDER BY m_id DESC LIMIT ?, ?`
   const [res] = await exec.query<RowDataPacket[]>(sql, [...valArr, offset, limit])
   return res
 }
@@ -60,6 +60,14 @@ export const warehousePageActionInfoModel = async (offset: number, limit: number
   const sql = `SELECT t_issue_info.m_id, t_warehouse.m_id AS warehouse_m_id, issue_create_time, user_name, t_warehouse_action_info.warehouse_name, action_type FROM t_issue_info INNER JOIN t_warehouse_action_info ON t_issue_info.issue_id = t_warehouse_action_info.issue_id INNER JOIN t_warehouse ON t_warehouse_action_info.warehouse_id = t_warehouse.warehouse_id INNER JOIN t_user ON t_issue_info.user_id = t_user.user_id ${where}${fieldArr.join(' AND ')} ORDER BY t_issue_info.m_id DESC LIMIT ?, ?`
   const [res] = await exec.query<RowDataPacket[]>(sql, [...valArr, offset, limit])
   return res
+}
+
+// 获取经手的仓库信息
+export const handleWarehouseModel = async (user_id: string, connection?: any): Promise<RowDataPacket[]> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'SELECT t_warehouse.m_id, warehouse_name, warehouse_type FROM t_warehouse INNER JOIN t_user ON t_warehouse.warehouse_user_id = ? AND t_warehouse.is_delete = 0'
+  const [warehouseInfo] = await exec.query<RowDataPacket[]>(sql, [user_id])
+  return warehouseInfo
 }
 
 // 新增仓库操作信息
