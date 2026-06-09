@@ -87,11 +87,11 @@ export const warehouseInfoModel = async (m_id: number, connection?: any): Promis
 }
 
 // 获取仓库经手者ID
-export const warehouseHandleUserIdModel = async (m_id: number, connection?: any): Promise<string> => {
+export const warehouseHandleUserIdModel = async (m_id: number, connection?: any): Promise<RowDataPacket> => {
   const exec = (connection || pool) as typeof pool
-  const sql = 'SELECT warehouse_user_id FROM t_warehouse WHERE m_id = ? AND is_delete = 0'
+  const sql = 'SELECT warehouse_user_id, warehouse_id FROM t_warehouse WHERE m_id = ? AND is_delete = 0'
   const [res] = await exec.query<RowDataPacket[]>(sql, [m_id])
-  return res[0].warehouse_user_id
+  return res[0]
 }
 
 // 仓库名查重
