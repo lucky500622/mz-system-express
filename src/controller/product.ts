@@ -270,13 +270,12 @@ export const getProductName: Controller<void> = async (req, res, next) => {
 // 获取某个仓库下所属全部产品信息
 export const getWarehouseProduct: Controller<void> = async (req, res, next) => {
   try {
-    const { m_id } = req.query
     // 获取仓库信息
-    const warehouseInfo = await warehouseInfoModel(Number(m_id))
+    const warehouseInfo = await warehouseInfoModel(Number(res.locals.warehouseInfo.m_id))
     if (!warehouseInfo) throw new Error('仓库不存在')
 
     // 获取仓库产品信息
-    const warehouseProduct = await warehouseProductModel(Number(m_id))
+    const warehouseProduct = await warehouseProductModel(Number(res.locals.warehouseInfo.m_id))
 
     res.json({
       code: 200,

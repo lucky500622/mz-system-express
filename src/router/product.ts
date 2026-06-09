@@ -3,7 +3,7 @@ const router = express.Router()
 
 import { productPageInfo, productPageActionInfo, addProduct, deleteProduct, adjustProductNum, editProductDescription, getProductName, getWarehouseProduct } from '../controller/product.ts'
 import { pageValidator } from '../validator/page.ts'
-import { addProductValidator, deleteProductValidator, adjustProductNumValidator, productInfoValidator, productActionInfoValidator, editProductDescriptionValidator, productNameValidator, warehouseProductValidator } from '../validator/product.ts'
+import { addProductValidator, deleteProductValidator, adjustProductNumValidator, productInfoValidator, productActionInfoValidator, editProductDescriptionValidator, productNameValidator } from '../validator/product.ts'
 import { checkWarehouseUser } from '../middleware/checkWarehouseUser.ts'
 
 // 分页获取产品信息
@@ -28,6 +28,6 @@ router.patch('/editDescription', editProductDescriptionValidator, editProductDes
 router.get('/name', productNameValidator, getProductName)
 
 // 获取仓库产品信息
-router.get('/infoOfWarehouse', checkWarehouseUser, warehouseProductValidator, getWarehouseProduct)
+router.get('/infoOfWarehouse', checkWarehouseUser, getWarehouseProduct)
 
 export default router

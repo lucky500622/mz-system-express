@@ -8,7 +8,7 @@ import { getTodoModel, createTodoModel, deleteTodoModel } from '../model/todo.ts
 export const getTodo: Controller<void> = async (req, res, next) => {
   try {
     // 获取待办事项
-    const todo = await getTodoModel(res.locals.userInfo.user_id, res.locals.warehouseId)
+    const todo = await getTodoModel(res.locals.userInfo.user_id, res.locals.warehouseInfo.warehouse_id)
 
     res.json({
       code: 200,
@@ -29,7 +29,7 @@ export const addTodo: Controller<void> = async (req, res, next) => {
     // 新增待办事项
     const { todo_content } = req.body
     const todo_id = uuidv4()
-    await createTodoModel(todo_id, res.locals.userInfo.user_id, res.locals.warehouseId, todo_content)
+    await createTodoModel(todo_id, res.locals.userInfo.user_id, res.locals.warehouseInfo.warehouse_id, todo_content)
 
     res.json({
       code: 200,
@@ -45,8 +45,8 @@ export const addTodo: Controller<void> = async (req, res, next) => {
 export const deleteTodo: Controller<void> = async (req, res, next) => {
   try {
     // 删除待办事项
-    const { todo_m_id } = req.query
-    await deleteTodoModel(Number(todo_m_id))
+    const { m_id } = req.query
+    await deleteTodoModel(Number(m_id))
 
     res.json({
       code: 200,
