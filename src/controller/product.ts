@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 
 import pool from '../config/db.ts'
-import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel, productNameModel } from '../model/product.ts'
+import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel, productNameModel, warehouseProductModel } from '../model/product.ts'
 import { warehouseInfoModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -260,6 +260,31 @@ export const getProductName: Controller<void> = async (req, res, next) => {
       message: '产品名获取成功',
       data: {
         name: productName
+      }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 获取某个仓库下所属全部产品信息
+export const getWarehouseProduct: Controller<void> = async (req, res, next) => {
+  try {
+    const { m_id } = req.query
+    // 获取仓库信息
+    const warehouseInfo = await warehouseInfoModel(Number(m_id))
+    if (!warehouseInfo) throw new Error('仓库不存在')
+
+    // 获取仓库产品信息
+    const warehouseProduct = await warehouseProductModel(Number(m_id))
+
+    res.json({
+      code: 200,
+      message: '仓库产品信息获取成功',
+      data: {
+        warehouse_name: warehouseInfo.warehouse_name,
+        warehouse_type: warehouseInfo.warehouse_type,
+        warehouseProduct: warehouseProduct
       }
     })
   } catch (err) {

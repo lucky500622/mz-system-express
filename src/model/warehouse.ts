@@ -81,9 +81,17 @@ export const addWareActionInfoModel = async (issue_id: string, warehouse_id: str
 // 获取仓库信息
 export const warehouseInfoModel = async (m_id: number, connection?: any): Promise<RowDataPacket> => {
   const exec = (connection || pool) as typeof pool
-  const sql = 'SELECT t_warehouse.m_id, warehouse_id, warehouse_name, warehouse_create_time, warehouse_name_ed, COUNT(t_product.product_num) AS product_num, IF(MAX(product_list_num) = 0 OR MAX(product_list_num) IS NULL, 0, 1) AS exists_list_product, IF(warehouse_user_id IS NOT NULL, 1,0) AS exists_user_handle FROM t_warehouse LEFT OUTER JOIN t_product ON t_warehouse.warehouse_id = t_product.product_belong_id AND t_product.is_delete = 0 WHERE t_warehouse.m_id = ? AND t_warehouse.is_delete = 0 GROUP BY t_warehouse.m_id'
+  const sql = 'SELECT t_warehouse.m_id, warehouse_id, warehouse_name, warehouse_type, warehouse_create_time, warehouse_name_ed, IF(MAX(product_list_num) = 0 OR MAX(product_list_num) IS NULL, 0, 1) AS exists_list_product, IF(warehouse_user_id IS NOT NULL, 1,0) AS exists_user_handle FROM t_warehouse LEFT OUTER JOIN t_product ON t_warehouse.warehouse_id = t_product.product_belong_id AND t_product.is_delete = 0 WHERE t_warehouse.m_id = ? AND t_warehouse.is_delete = 0 GROUP BY t_warehouse.m_id'
   const [res] = await exec.query<RowDataPacket[]>(sql, [m_id])
   return res[0]
+}
+
+// 获取仓库经手者ID
+export const warehouseHandleUserIdModel = async (m_id: number, connection?: any): Promise<string> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'SELECT warehouse_user_id FROM t_warehouse WHERE m_id = ? AND is_delete = 0'
+  const [res] = await exec.query<RowDataPacket[]>(sql, [m_id])
+  return res[0].warehouse_user_id
 }
 
 // 仓库名查重

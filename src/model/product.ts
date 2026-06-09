@@ -137,3 +137,11 @@ export const productNameModel = async (text: string, limit: number, connection?:
   const [res] = await exec.query<RowDataPacket[]>(sql, [`%${text}%`, limit])
   return res
 }
+
+// 获取某个仓库下所属全部产品信息
+export const warehouseProductModel = async (m_id: number, connection?: any): Promise<RowDataPacket[]> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'SELECT t_product.m_id, product_name, product_type, product_num, product_description, product_list_num, product_diff_num, COUNT(IF(product_num IS NULL OR product_num = 0, NULL, 1)) AS product_count, COUNT(IF(product_list_num IS NULL OR product_diff_num = 0, NULL, 1)) AS listed_product_num FROM t_warehouse LEFT OUTER JOIN t_product ON t_warehouse.warehouse_id = t_product.product_belong_id AND t_product.is_delete = 0 WHERE t_warehouse.m_id = ? GROUP BY t_product.m_id'
+  const [res] = await exec.query<RowDataPacket[]>(sql, [m_id])
+  return res
+}
