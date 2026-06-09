@@ -336,6 +336,15 @@ export const addHandleWarehouse: Controller<void> = async (req, res, next) => {
       const warehouse_isAdd = await addHandleWarehouseModel(m_id, warehouse_user_id, connection)
       if (!warehouse_isAdd) throw new Error('仓库添加失败')
 
+      // 新增操作信息
+      const issue_id = uuidv4()
+      const issue_isAdd = await addIssueInfoModel(issue_id, res.locals.userInfo.user_id, connection)
+      if (!issue_isAdd) throw new Error('操作信息新增失败')
+
+      // 新增仓库操作信息
+      const warehouse_action_isAdd = await addWareActionInfoModel(issue_id, warehouseInfo.warehouse_id, 4, warehouseInfo.warehouse_name, connection)
+      if (!warehouse_action_isAdd) throw new Error('仓库操作信息新增失败')
+
       connection.commit()
     } catch (err) {
       connection.rollback()
