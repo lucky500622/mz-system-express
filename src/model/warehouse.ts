@@ -89,7 +89,7 @@ export const warehouseInfoModel = async (m_id: number, connection?: any): Promis
 // 获取仓库经手者ID
 export const warehouseHandleUserIdModel = async (m_id: number, connection?: any): Promise<RowDataPacket> => {
   const exec = (connection || pool) as typeof pool
-  const sql = 'SELECT warehouse_user_id, warehouse_id FROM t_warehouse WHERE m_id = ? AND is_delete = 0'
+  const sql = 'SELECT warehouse_user_id, warehouse_id, warehouse_name FROM t_warehouse WHERE m_id = ? AND is_delete = 0'
   const [res] = await exec.query<RowDataPacket[]>(sql, [m_id])
   return res[0]
 }
@@ -158,5 +158,13 @@ export const addHandleWarehouseModel = async (m_id: number, user_id: string, con
   const exec = (connection || pool) as typeof pool
   const sql = 'UPDATE t_warehouse SET warehouse_user_id = ? WHERE m_id = ?'
   const [res] = await exec.query<OkPacket>(sql, [user_id, m_id])
+  return res.affectedRows > 0
+}
+
+// 退出经手仓库
+export const exitHandleWarehouseModel = async (m_id: number, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'UPDATE t_warehouse SET warehouse_user_id = NULL WHERE m_id = ?'
+  const [res] = await exec.query<OkPacket>(sql, [m_id])
   return res.affectedRows > 0
 }

@@ -153,3 +153,11 @@ export const listProductModel = async (m_id: number, product_list_num: number, c
   const [res] = await exec.query<OkPacket>(sql, [product_list_num, m_id])
   return res.affectedRows > 0
 }
+
+// 下架某个仓库下所有产品
+export const downListAllProductsModel = async (m_id: number, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `UPDATE t_product INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id AND t_product.is_delete = 0 SET product_list_num = 0 WHERE t_warehouse.m_id = ? `
+  const [res] = await exec.query<OkPacket>(sql, [m_id])
+  return true
+}
