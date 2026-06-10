@@ -1,9 +1,9 @@
 import express from 'express'
 const router = express.Router()
 
-import { productPageInfo, productPageActionInfo, addProduct, deleteProduct, adjustProductNum, editProductDescription, getProductName, getWarehouseProduct, listProduct } from '../controller/product.ts'
+import { productPageInfo, productPageActionInfo, addProduct, deleteProduct, adjustProductNum, editProductDescription, getProductName, getWarehouseProduct, listProduct, saleProduct } from '../controller/product.ts'
 import { pageValidator } from '../validator/page.ts'
-import { addProductValidator, deleteProductValidator, adjustProductNumValidator, productInfoValidator, productActionInfoValidator, editProductDescriptionValidator, productNameValidator, listProductValidator } from '../validator/product.ts'
+import { addProductValidator, deleteProductValidator, adjustProductNumValidator, productInfoValidator, productActionInfoValidator, editProductDescriptionValidator, productNameValidator, listProductValidator, saleProductValidator } from '../validator/product.ts'
 import { checkWarehouseUser } from '../middleware/checkWarehouseUser.ts'
 
 // 分页获取产品信息
@@ -32,5 +32,8 @@ router.get('/infoOfWarehouse', checkWarehouseUser, getWarehouseProduct)
 
 // 上下架产品
 router.patch('/list/update', checkWarehouseUser, listProductValidator, listProduct)
+
+// 售出产品
+router.patch('/sale', checkWarehouseUser, saleProductValidator, saleProduct)
 
 export default router

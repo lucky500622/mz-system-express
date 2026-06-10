@@ -146,7 +146,7 @@ export const warehouseProductModel = async (m_id: number, connection?: any): Pro
   return res
 }
 
-// 上下架产品
+// 上下架产品数量调整
 export const listProductModel = async (m_id: number, product_list_num: number, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool
   const sql = `UPDATE t_product SET product_list_num = ? WHERE m_id = ?`

@@ -389,3 +389,59 @@ export const listProduct: Controller<void> = async (req, res, next) => {
     next(err)
   }
 }
+
+// 售出产品
+export const saleProduct: Controller<void> = async (req, res, next) => {
+  try {
+    const connection = await pool.getConnection()
+    connection.beginTransaction()
+    try {
+      const { m_id, product_num } = req.body
+      let listEndNum = 0
+      let stoEndNum = 0
+      const productInfo = await productInfoModel(m_id, connection)
+      if (!productInfo) throw new Error('产品不存在')
+
+      // 检查产品是否足够
+      if (product_num > productInfo.product_list_num) {
+        res.json({
+          code: 4024,
+          message: '操作数量不足'
+        })
+        return
+      }
+      listEndNum = productInfo.product_list_num - product_num
+      stoEndNum = productInfo.product_num - product_num
+
+      // 售出产品
+      // 产品数量调整
+      const product_isUpdate = await adjustProductNumModel(m_id, stoEndNum, connection)
+      if (!product_isUpdate) throw new Error('产品售出失败')
+      // 下架产品
+      const list_isUpdate = await listProductModel(m_id, listEndNum, connection)
+      if (!list_isUpdate) throw new Error('产品售架失败')
+
+      // 新增操作信息
+      const issue_id = uuidv4()
+      const issue_isAdd = await addIssueInfoModel(issue_id, res.locals.userInfo.user_id, connection)
+      if (!issue_isAdd) throw new Error('操作信息新增失败')
+
+      // 新增产品操作信息
+      const product_action_isAdd = await addProductActionInfoModel(issue_id, productInfo.product_id, 7, product_num, connection)
+      if (!product_action_isAdd) throw new Error('产品操作信息新增失败')
+
+      connection.commit()
+    } catch (err) {
+      connection.rollback()
+    } finally {
+      connection.release()
+    }
+
+    res.json({
+      code: 200,
+      message: '产品售出成功'
+    })
+  } catch (err) {
+    next(err)
+  }
+}

@@ -103,3 +103,13 @@ export const listProductValidator = validate([
     .notEmpty().withMessage('是否全部操作不能为空').bail()
     .isBoolean().withMessage('是否全部操作必须是布尔值')
 ])
+
+// 售出产品校验
+export const saleProductValidator = validate([
+  body('m_id')
+    .notEmpty().withMessage('产品序列号不能为空').bail()
+    .isInt().withMessage('产品序列号必须是整数'),
+  body('product_num')
+    .notEmpty().withMessage('产品数量不能为空').bail()
+    .isInt({ min: 1 }).withMessage('产品数量必须是整数且大于等于1')
+])
