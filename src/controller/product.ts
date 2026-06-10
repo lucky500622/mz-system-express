@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 
 import pool from '../config/db.ts'
-import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel, productNameModel, warehouseProductModel } from '../model/product.ts'
+import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel, productNameModel, warehouseProductModel, listProductModel } from '../model/product.ts'
 import { warehouseInfoModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -285,6 +285,105 @@ export const getWarehouseProduct: Controller<void> = async (req, res, next) => {
         warehouse_type: warehouseInfo.warehouse_type,
         warehouseProduct: warehouseProduct
       }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 上下架产品
+export const listProduct: Controller<void> = async (req, res, next) => {
+  try {
+    const connection = await pool.getConnection()
+    connection.beginTransaction()
+    try {
+
+      // 获取产品信息
+      const { m_id, product_num, action_type, action_all } = req.body
+      const productInfo = await productInfoModel(m_id, connection)
+      if (!productInfo) throw new Error('产品不存在')
+
+      let endNum = 0
+      let actionAll_actionNum = 0
+      // 检查产品上架数量是否超过库存数量
+      if (action_type === 5) {
+        if (action_all) {
+          // 全部上架产品
+          if (productInfo.product_num === 0) {
+            res.json({
+              code: 4024,
+              message: '操作数量不足'
+            })
+            return
+          }
+          endNum = productInfo.product_num
+          actionAll_actionNum = productInfo.product_diff_num
+        } else {
+          // 上架产品
+          if (product_num > productInfo.product_diff_num) {
+            res.json({
+              code: 4024,
+              message: '操作数量不足'
+            })
+            return
+          }
+          endNum = productInfo.product_list_num + product_num
+        }
+      } else if (action_type === 6) {
+        if (action_all) {
+          // 全部下架产品
+          if (productInfo.product_list_num === 0) {
+            res.json({
+              code: 4024,
+              message: '操作数量不足'
+            })
+            return
+          }
+          endNum = 0
+          actionAll_actionNum = productInfo.product_list_num
+        } else {
+          // 下架产品
+          if (product_num > productInfo.product_list_num) {
+            res.json({
+              code: 4024,
+              message: '操作数量不足'
+            })
+            return
+          }
+          endNum = productInfo.product_list_num - product_num
+        }
+      }
+
+      // 上下架产品
+      const product_isUpdate = await listProductModel(m_id, endNum, connection)
+      if (!product_isUpdate) throw new Error('产品上架失败')
+
+      // 新增操作信息
+      const issue_id = uuidv4()
+      const issue_isAdd = await addIssueInfoModel(issue_id, res.locals.userInfo.user_id, connection)
+      if (!issue_isAdd) throw new Error('操作信息新增失败')
+
+      // 新增产品操作信息
+      if (action_all) {
+        // 全部操作产品
+        const product_action_isAdd = await addProductActionInfoModel(issue_id, productInfo.product_id, action_type, actionAll_actionNum, connection)
+        if (!product_action_isAdd) throw new Error('产品操作信息新增失败')
+      } else {
+        // 操作产品
+        const product_action_isAdd = await addProductActionInfoModel(issue_id, productInfo.product_id, action_type, product_num, connection)
+        if (!product_action_isAdd) throw new Error('产品操作信息新增失败')
+      }
+
+      connection.commit()
+    } catch (err) {
+      connection.rollback()
+    } finally {
+      connection.release()
+    }
+
+    res.json({
+      code: 200,
+      message: '产品上架成功'
     })
   } catch (err) {
     next(err)

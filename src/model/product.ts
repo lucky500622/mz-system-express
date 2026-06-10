@@ -145,3 +145,11 @@ export const warehouseProductModel = async (m_id: number, connection?: any): Pro
   const [res] = await exec.query<RowDataPacket[]>(sql, [m_id])
   return res
 }
+
+// 上下架产品
+export const listProductModel = async (m_id: number, product_list_num: number, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `UPDATE t_product SET product_list_num = ? WHERE m_id = ?`
+  const [res] = await exec.query<OkPacket>(sql, [product_list_num, m_id])
+  return res.affectedRows > 0
+}

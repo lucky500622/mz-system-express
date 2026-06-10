@@ -88,3 +88,18 @@ export const productNameValidator = validate([
   query('limit').optional()
     .isInt({ min: 1, max: 100 }).withMessage('限制数量必须在1-100之间')
 ])
+
+// 上下架产品校验
+export const listProductValidator = validate([
+  body('m_id')
+    .notEmpty().withMessage('产品序列号不能为空').bail()
+    .isInt().withMessage('产品序列号必须是整数'),
+  body('action_type')
+    .notEmpty().withMessage('操作类型不能为空').bail()
+    .isInt().withMessage('操作类型必须是整数'),
+  body('product_num').optional()
+    .isInt({ min: 1 }).withMessage('产品数量必须是整数且大于等于1'),
+  body('action_all')
+    .notEmpty().withMessage('是否全部操作不能为空').bail()
+    .isBoolean().withMessage('是否全部操作必须是布尔值')
+])
