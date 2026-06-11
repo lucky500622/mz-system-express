@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 
 import pool from '../config/db.ts'
-import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel, productNameModel, warehouseProductModel, listProductModel } from '../model/product.ts'
+import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel, productNameModel, warehouseProductModel, listProductModel, productOverviewModel, productDayActionInfoModel } from '../model/product.ts'
 import { warehouseInfoModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -441,6 +441,40 @@ export const saleProduct: Controller<void> = async (req, res, next) => {
     res.json({
       code: 200,
       message: '产品售出成功'
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 获取产品概览信息
+export const getProductOverview: Controller<void> = async (req, res, next) => {
+  try {
+    const productOverview = await productOverviewModel()
+    res.json({
+      code: 200,
+      message: '产品概览信息获取成功',
+      data: {
+        count: productOverview.count,
+        total_product_num: Number(productOverview.total_product_num),
+        listed_product_num: Number(productOverview.listed_product_num)
+      }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 获取某一日产品新增总量、减少总量、售出总量操作信息
+export const getProductDayActionInfo: Controller<void> = async (req, res, next) => {
+  try {
+    const productDayActionInfo = await productDayActionInfoModel()
+    res.json({
+      code: 200,
+      message: '产品操作信息获取成功',
+      data: {
+        productDayActionInfo
+      }
     })
   } catch (err) {
     next(err)

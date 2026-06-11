@@ -178,3 +178,35 @@ export const downListAllProductsModel = async (m_id: number, connection?: any): 
   const [res] = await exec.query<OkPacket>(sql, [m_id])
   return true
 }
+
+// 获取产品概览信息
+export const productOverviewModel = async (connection?: any): Promise<RowDataPacket> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'SELECT COUNT(m_id) AS count, SUM(product_num) AS total_product_num, SUM(product_list_num) AS listed_product_num FROM t_product WHERE is_delete = 0'
+  const [res] = await exec.query<RowDataPacket[]>(sql)
+  return res[0]
+}
+
+// 获取最近七天产品新增总量、减少总量、售出总量操作信息
+export const productDayActionInfoModel = async (connection?: any): Promise<RowDataPacket> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `
+  SELECT
+    GROUP_CONCAT(IFNULL(stat.in_total,0) ORDER BY dl.days_ago DESC SEPARATOR ',') AS in_arr,
+    GROUP_CONCAT(IFNULL(stat.out_total,0) ORDER BY dl.days_ago DESC SEPARATOR ',') AS out_arr,
+    GROUP_CONCAT(IFNULL(stat.sale_total,0) ORDER BY dl.days_ago DESC SEPARATOR ',') AS sale_arr
+  FROM (
+    SELECT 0 days_ago UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION SELECT 6
+  ) dl LEFT JOIN (
+    SELECT
+      DATEDIFF(CURDATE(), DATE(issue_create_time)) AS days_ago,
+      SUM(IF(action_type IN (1,3), action_num, 0)) AS in_total,
+      SUM(IF(action_type IN (2,4), action_num, 0)) AS out_total,
+      SUM(IF(action_type = 7, action_num, 0)) AS sale_total
+    FROM t_product_action_info INNER JOIN t_issue_info ON t_product_action_info.issue_id = t_issue_info.issue_id
+    WHERE DATEDIFF(CURDATE(), DATE(issue_create_time)) BETWEEN 0 AND 6
+    GROUP BY days_ago
+  ) stat ON dl.days_ago = stat.days_ago`
+  const [res] = await exec.query<RowDataPacket[]>(sql)
+  return res[0]
+}

@@ -25,7 +25,7 @@ export const warehousePageInfoModel = async (offset: number, limit: number, m_id
     valArr.push(`%${user_name}%`)
   }
   const where = fieldArr.length > 0 ? ' WHERE ' : ''
-  const sql = `SELECT t_warehouse.m_id, warehouse_name_ed, warehouse_name, warehouse_type, user_name, warehouse_description, IF(MAX(product_list_num) = 0 OR MAX(product_list_num) IS NULL, 0, 1) AS exists_list_product, IF(warehouse_user_id IS NOT NULL, 1, 0) AS exists_user_handle, warehouse_create_time  FROM t_warehouse INNER JOIN t_user ON t_warehouse.warehouse_creater_id = t_user.user_id AND t_warehouse.is_delete = 0 LEFT OUTER JOIN t_product ON warehouse_id = product_belong_id AND t_product.is_delete = 0${where}${fieldArr.join(' AND ')} GROUP BY t_warehouse.m_id ORDER BY m_id DESC LIMIT ?, ?`
+  const sql = `SELECT t_warehouse.m_id, warehouse_name_ed, warehouse_name, warehouse_type, user_name, warehouse_description, IF(MAX(product_list_num) = 0 OR MAX(product_list_num) IS NULL, 0, 1) AS exists_list_product, IF(warehouse_user_id IS NOT NULL, 1, 0) AS exists_user_handle, warehouse_create_time, SUM(product_num) AS total_product_num FROM t_warehouse INNER JOIN t_user ON t_warehouse.warehouse_creater_id = t_user.user_id AND t_warehouse.is_delete = 0 LEFT OUTER JOIN t_product ON warehouse_id = product_belong_id AND t_product.is_delete = 0${where}${fieldArr.join(' AND ')} GROUP BY t_warehouse.m_id ORDER BY m_id DESC LIMIT ?, ?`
   const [res] = await exec.query<RowDataPacket[]>(sql, [...valArr, offset, limit])
   return res
 }
@@ -167,4 +167,12 @@ export const exitHandleWarehouseModel = async (m_id: number, connection?: any): 
   const sql = 'UPDATE t_warehouse SET warehouse_user_id = NULL WHERE m_id = ?'
   const [res] = await exec.query<OkPacket>(sql, [m_id])
   return res.affectedRows > 0
+}
+
+// 获取仓库概览信息
+export const warehouseOverviewModel = async (connection?: any): Promise<RowDataPacket> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'SELECT COUNT(m_id) AS count, IFNULL(SUM(IF(warehouse_user_id IS NOT NULL, 1, 0)), 0) AS handle_count FROM t_warehouse WHERE is_delete = 0'
+  const [res] = await exec.query<RowDataPacket[]>(sql)
+  return res[0]
 }

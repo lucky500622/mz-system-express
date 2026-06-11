@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 
-import { warehousePageInfo, warehousePageActionInfo, addWarehouse, editWarehouse, deleteWarehouse, warehouseInfo, editWarehouseDescription, getWarehouseName, handleWarehouse, addHandleWarehouse, exitHandleWarehouse } from '../controller/warehouse.ts'
+import { warehousePageInfo, warehousePageActionInfo, addWarehouse, editWarehouse, deleteWarehouse, warehouseInfo, editWarehouseDescription, getWarehouseName, handleWarehouse, addHandleWarehouse, exitHandleWarehouse, getWarehouseOverview } from '../controller/warehouse.ts'
 import { pageValidator } from '../validator/page.ts'
 import { addWarehouseValidator, editWarehouseValidator, deleteWarehouseValidator, warehouseInfoValidator, warehouseActionInfoValidator, oneWarehouseInfoValidator, editWarehouseDescriptionValidator, randomWarehouseNameValidator, addHandleWarehouseValidator } from '../validator/warehouse.ts'
 import { checkWarehouseUser } from '../middleware/checkWarehouseUser.ts'
@@ -38,5 +38,8 @@ router.patch('/addHandle', addHandleWarehouseValidator, addHandleWarehouse)
 
 // 退出经手仓库
 router.patch('/exitHandle', checkWarehouseUser, exitHandleWarehouse)
+
+// 获取仓库概览信息
+router.get('/overview', getWarehouseOverview)
 
 export default router

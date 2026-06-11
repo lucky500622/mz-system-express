@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 
-import { productPageInfo, productPageActionInfo, addProduct, deleteProduct, adjustProductNum, editProductDescription, getProductName, getWarehouseProduct, listProduct, saleProduct } from '../controller/product.ts'
+import { productPageInfo, productPageActionInfo, addProduct, deleteProduct, adjustProductNum, editProductDescription, getProductName, getWarehouseProduct, listProduct, saleProduct, getProductOverview, getProductDayActionInfo } from '../controller/product.ts'
 import { pageValidator } from '../validator/page.ts'
 import { addProductValidator, deleteProductValidator, adjustProductNumValidator, productInfoValidator, productActionInfoValidator, editProductDescriptionValidator, productNameValidator, listProductValidator, saleProductValidator, warehouseProductValidator } from '../validator/product.ts'
 import { checkWarehouseUser } from '../middleware/checkWarehouseUser.ts'
@@ -35,5 +35,11 @@ router.patch('/list/update', checkWarehouseUser, listProductValidator, listProdu
 
 // 售出产品
 router.patch('/sale', checkWarehouseUser, saleProductValidator, saleProduct)
+
+// 获取产品概览信息
+router.get('/overview', getProductOverview)
+
+// 获取某一日产品新增总量、减少总量、售出总量操作信息
+router.get('/dayActionInfo', getProductDayActionInfo)
 
 export default router
