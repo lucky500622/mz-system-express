@@ -89,6 +89,16 @@ export const productNameValidator = validate([
     .isInt({ min: 1, max: 100 }).withMessage('限制数量必须在1-100之间')
 ])
 
+// 获取仓库产品信息校验
+export const warehouseProductValidator = validate([
+  query('product_m_id').optional()
+    .isInt().withMessage('产品序列号必须是整数'),
+  query('product_name').optional()
+    .isString().withMessage('产品名称必须是字符串'),
+  query('product_type').optional()
+    .isString().withMessage('产品类型必须是字符串')
+])
+
 // 上下架产品校验
 export const listProductValidator = validate([
   body('m_id')

@@ -275,7 +275,8 @@ export const getWarehouseProduct: Controller<void> = async (req, res, next) => {
     if (!warehouseInfo) throw new Error('仓库不存在')
 
     // 获取仓库产品信息
-    const warehouseProduct = await warehouseProductModel(Number(res.locals.warehouseInfo.m_id))
+    const { product_m_id, product_name, product_type } = req.query
+    const warehouseProduct = await warehouseProductModel(Number(res.locals.warehouseInfo.m_id), Number(product_m_id), String(product_name || ''), String(product_type || ''))
 
     res.json({
       code: 200,
