@@ -100,7 +100,8 @@ export const addWarehouse: Controller<void> = async (req, res, next) => {
       // 新增仓库
       const warehouse_id = uuidv4()
       const { warehouse_type, warehouse_description } = req.body
-      const warehouse_isAdd = await addWarehouseModel(warehouse_id, warehouse_name, res.locals.userInfo.user_id, warehouse_type, warehouse_description, connection)
+      const description = warehouse_description ? `${warehouse_description} --- ${res.locals.userInfo.user_name}` : ''
+      const warehouse_isAdd = await addWarehouseModel(warehouse_id, warehouse_name, res.locals.userInfo.user_id, warehouse_type, description, connection)
       if (!warehouse_isAdd) throw new Error('仓库新增失败')
 
       // 新增操作信息
