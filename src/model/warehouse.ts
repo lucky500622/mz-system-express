@@ -9,7 +9,7 @@ export const warehousePageInfoModel = async (offset: number, limit: number, m_id
   const fieldArr = []
   const valArr = []
   if (m_id) {
-    fieldArr.push('m_id = ?')
+    fieldArr.push(' t_warehouse.m_id = ?')
     valArr.push(m_id)
   }
   if (warehouse_name) {
