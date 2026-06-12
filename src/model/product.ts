@@ -210,3 +210,14 @@ export const productDayActionInfoModel = async (connection?: any): Promise<RowDa
   const [res] = await exec.query<RowDataPacket[]>(sql)
   return res[0]
 }
+
+// 获取需要预警的产品
+export const productWarningModel = async (connection?: any): Promise<RowDataPacket[]> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `
+  SELECT t_product.m_id, t_product.product_name, t_product.m_id AS product_m_id, t_warehouse.warehouse_name, t_product.product_diff_num, t_product.product_list_num
+    FROM t_warehouse INNER JOIN t_product ON t_warehouse.warehouse_id = t_product.product_belong_id AND t_product.is_delete = 0 AND t_warehouse.is_delete = 0 
+    WHERE t_product.product_diff_num <= 100 AND t_product.product_list_num <> 0`
+  const [res] = await exec.query<RowDataPacket[]>(sql)
+  return res
+}

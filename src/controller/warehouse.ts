@@ -423,4 +423,4 @@ export const getWarehouseOverview: Controller<void> = async (req, res, next) => 
   } catch (err) {
     next(err)
   }
-} 
+}

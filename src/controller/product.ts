@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../types/express.ts'
 
 import pool from '../config/db.ts'
-import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel, productNameModel, warehouseProductModel, listProductModel, productOverviewModel, productDayActionInfoModel } from '../model/product.ts'
+import { productPageInfoModel, productPageActionInfoModel, addProductModel, addProductActionInfoModel, productInfoModel, deleteProductModel, adjustProductNumModel, editProductDescriptionModel, productNameModel, warehouseProductModel, listProductModel, productOverviewModel, productDayActionInfoModel, productWarningModel } from '../model/product.ts'
 import { warehouseInfoModel } from '../model/warehouse.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
 
@@ -474,6 +474,22 @@ export const getProductDayActionInfo: Controller<void> = async (req, res, next) 
       message: '产品操作信息获取成功',
       data: {
         productDayActionInfo
+      }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 获取需要预警的产品
+export const getProductWarning: Controller<void> = async (req, res, next) => {
+  try {
+    const productWarning = await productWarningModel()
+    res.json({
+      code: 200,
+      message: '需要预警的产品获取成功',
+      data: {
+        warning: productWarning
       }
     })
   } catch (err) {
