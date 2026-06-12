@@ -25,7 +25,11 @@ export const productPageInfoModel = async (offset: number, limit: number, m_id?:
     valArr.push(warehouse_m_id)
   }
   const where = fieldArr.length > 0 ? 'AND ' : ''
-  const sql = `SELECT t_product.m_id, t_warehouse.m_id AS warehouse_m_id, product_name, product_type, product_num, product_list_num, product_diff_num, product_description FROM t_product INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id WHERE t_product.is_delete = 0 AND t_warehouse.is_delete = 0 ${where}${fieldArr.join(' AND ')} ORDER BY t_product.m_id DESC LIMIT ?, ?`
+  const sql = `
+  SELECT t_product.m_id, t_warehouse.m_id AS warehouse_m_id, product_name, product_type, product_num, product_list_num, product_diff_num, product_description 
+    FROM t_product INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id
+    WHERE t_product.is_delete = 0 AND t_warehouse.is_delete = 0 ${where}${fieldArr.join(' AND ')}
+    ORDER BY t_product.m_id DESC LIMIT ?, ?`
   const [res] = await exec.query<RowDataPacket[]>(sql, [...valArr, offset, limit])
   return res
 }
@@ -57,7 +61,13 @@ export const productPageActionInfoModel = async (offset: number, limit: number, 
     valArr.push(`%${user_name}%`)
   }
   const where = fieldArr.length > 0 ? 'WHERE ' : ''
-  const sql = `SELECT t_issue_info.m_id, t_product.m_id AS product_m_id, issue_create_time, user_name, product_name, action_type, action_num FROM t_issue_info INNER JOIN t_product_action_info ON t_issue_info.issue_id = t_product_action_info.issue_id INNER JOIN t_product ON t_product_action_info.product_id = t_product.product_id INNER JOIN t_user ON t_issue_info.user_id = t_user.user_id ${where}${fieldArr.join(' AND ')} ORDER BY t_issue_info.m_id DESC LIMIT ?, ?`
+  const sql = `
+  SELECT t_issue_info.m_id, t_product.m_id AS product_m_id, issue_create_time, user_name, product_name, action_type, action_num FROM t_issue_info 
+    INNER JOIN t_product_action_info ON t_issue_info.issue_id = t_product_action_info.issue_id
+    INNER JOIN t_product ON t_product_action_info.product_id = t_product.product_id
+    INNER JOIN t_user ON t_issue_info.user_id = t_user.user_id
+  ${where}${fieldArr.join(' AND ')}
+  ORDER BY t_issue_info.m_id DESC LIMIT ?, ?`
   const [res] = await exec.query<RowDataPacket[]>(sql, [...valArr, offset, limit])
   return res
 }
@@ -133,7 +143,10 @@ export const editProductDescriptionModel = async (m_id: number, product_descript
 // 获取产品名称
 export const productNameModel = async (text: string, limit: number, connection?: any): Promise<RowDataPacket[]> => {
   const exec = (connection || pool) as typeof pool
-  const sql = `SELECT product_name AS name FROM t_product WHERE product_name LIKE ? AND is_delete = 0 ORDER BY RAND() LIMIT ?`
+  const sql = `
+  SELECT product_name AS name FROM t_product
+  WHERE product_name LIKE ? AND is_delete = 0
+  ORDER BY RAND() LIMIT ?`
   const [res] = await exec.query<RowDataPacket[]>(sql, [`%${text}%`, limit])
   return res
 }
@@ -158,7 +171,12 @@ export const warehouseProductModel = async (m_id: number, product_m_id?: number,
     valArr.push(`%${product_type}%`)
   }
 
-  const sql = `SELECT t_product.m_id, product_name, product_type, product_num, product_description, product_list_num, product_diff_num, COUNT(IF(product_num IS NULL OR product_num = 0, NULL, 1)) AS product_count, COUNT(IF(product_list_num IS NULL OR product_diff_num = 0, NULL, 1)) AS listed_product_num FROM t_warehouse LEFT OUTER JOIN t_product ON t_warehouse.warehouse_id = t_product.product_belong_id AND t_product.is_delete = 0 WHERE ${fieldArr.join(' AND ')} GROUP BY t_product.m_id`
+  const sql = `
+  SELECT t_product.m_id, product_name, product_type, product_num, product_description, product_list_num, product_diff_num, COUNT(IF(product_num IS NULL OR product_num = 0, NULL, 1)) AS product_count, COUNT(IF(product_list_num IS NULL OR product_diff_num = 0, NULL, 1)) AS listed_product_num 
+    FROM t_warehouse 
+    LEFT OUTER JOIN t_product ON t_warehouse.warehouse_id = t_product.product_belong_id AND t_product.is_delete = 0 
+  WHERE ${fieldArr.join(' AND ')}
+  GROUP BY t_product.m_id`
   const [res] = await exec.query<RowDataPacket[]>(sql, valArr)
   return res
 }
@@ -174,7 +192,10 @@ export const listProductModel = async (m_id: number, product_list_num: number, c
 // 下架某个仓库下所有产品
 export const downListAllProductsModel = async (m_id: number, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool
-  const sql = `UPDATE t_product INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id AND t_product.is_delete = 0 SET product_list_num = 0 WHERE t_warehouse.m_id = ? `
+  const sql = `
+  UPDATE t_product INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id AND t_product.is_delete = 0 
+    SET product_list_num = 0 
+  WHERE t_warehouse.m_id = ? `
   const [res] = await exec.query<OkPacket>(sql, [m_id])
   return true
 }
@@ -182,7 +203,10 @@ export const downListAllProductsModel = async (m_id: number, connection?: any): 
 // 获取产品概览信息
 export const productOverviewModel = async (connection?: any): Promise<RowDataPacket> => {
   const exec = (connection || pool) as typeof pool
-  const sql = 'SELECT COUNT(m_id) AS count, SUM(product_num) AS total_product_num, SUM(product_list_num) AS listed_product_num FROM t_product WHERE is_delete = 0'
+  const sql = `
+  SELECT COUNT(m_id) AS count, SUM(product_num) AS total_product_num, SUM(product_list_num) AS listed_product_num 
+  FROM t_product 
+  WHERE is_delete = 0`
   const [res] = await exec.query<RowDataPacket[]>(sql)
   return res[0]
 }

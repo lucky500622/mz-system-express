@@ -29,7 +29,10 @@ export const deleteTodoModel = async (m_id: number, connection?: any): Promise<b
 // 删除某仓库下用户的所有待办事项
 export const deleteAllTodoModel = async (m_id: number, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool
-  const sql = 'UPDATE t_todo_info INNER JOIN t_warehouse ON t_todo_info.warehouse_id = t_warehouse.warehouse_id AND t_todo_info.is_delete = 0 SET t_todo_info.is_delete = 1 WHERE t_warehouse.m_id = ?'
+  const sql = `
+  UPDATE t_todo_info INNER JOIN t_warehouse ON t_todo_info.warehouse_id = t_warehouse.warehouse_id AND t_todo_info.is_delete = 0 
+    SET t_todo_info.is_delete = 1 
+  WHERE t_warehouse.m_id = ?`
   const [res] = await exec.query<OkPacket>(sql, [m_id])
   return true
 }

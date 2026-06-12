@@ -37,7 +37,10 @@ export const createTokenModel = async (token: string, user_id: string, expireDat
 // 用户信息获取
 export const userInfoModel = async (token: string, connection?: any): Promise<RowDataPacket> => {
   const exec = (connection || pool) as typeof pool
-  const sql = 'SELECT user_name, user_role, user_id FROM t_user WHERE user_id = (SELECT user_id FROM t_user_session WHERE user_token = ?)'
+  const sql = `
+  SELECT user_name, user_role, user_id 
+  FROM t_user 
+  WHERE user_id = (SELECT user_id FROM t_user_session WHERE user_token = ?)`
   const [res] = await exec.query<RowDataPacket[]>(sql, [token])
   return res[0]
 }
