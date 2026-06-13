@@ -5,6 +5,8 @@ import { productPageInfo, productPageActionInfo, addProduct, deleteProduct, adju
 import { pageValidator } from '../validator/page.ts'
 import { addProductValidator, deleteProductValidator, adjustProductNumValidator, productInfoValidator, productActionInfoValidator, editProductDescriptionValidator, productNameValidator, listProductValidator, saleProductValidator, warehouseProductValidator } from '../validator/product.ts'
 import { checkWarehouseUser } from '../middleware/checkWarehouseUser.ts'
+import { checkAdminAuth } from '../middleware/checkAdminAuth.ts'
+import { checkStaffAuth } from '../middleware/checkStaffAuth.ts'
 
 // 分页获取产品信息
 router.get('/', pageValidator, productInfoValidator, productPageInfo)
@@ -13,16 +15,16 @@ router.get('/', pageValidator, productInfoValidator, productPageInfo)
 router.get('/action', pageValidator, productActionInfoValidator, productPageActionInfo)
 
 // 新增产品
-router.post('/add', addProductValidator, addProduct)
+router.post('/add', checkAdminAuth, addProductValidator, addProduct)
 
 // 删除产品
-router.patch('/delete', deleteProductValidator, deleteProduct)
+router.patch('/delete', checkAdminAuth, deleteProductValidator, deleteProduct)
 
 // 调整产品数量
-router.patch('/update', adjustProductNumValidator, adjustProductNum)
+router.patch('/update', checkAdminAuth, adjustProductNumValidator, adjustProductNum)
 
 // 编辑产品描述
-router.patch('/editDescription', editProductDescriptionValidator, editProductDescription)
+router.patch('/editDescription', checkAdminAuth, editProductDescriptionValidator, editProductDescription)
 
 // 获取产品名称
 router.get('/name', productNameValidator, getProductName)
@@ -31,10 +33,10 @@ router.get('/name', productNameValidator, getProductName)
 router.get('/infoOfWarehouse', checkWarehouseUser, warehouseProductValidator, getWarehouseProduct)
 
 // 上下架产品
-router.patch('/list/update', checkWarehouseUser, listProductValidator, listProduct)
+router.patch('/list/update', checkStaffAuth, listProductValidator, listProduct)
 
 // 售出产品
-router.patch('/sale', checkWarehouseUser, saleProductValidator, saleProduct)
+router.patch('/sale', checkStaffAuth, saleProductValidator, saleProduct)
 
 // 获取产品概览信息
 router.get('/overview', getProductOverview)

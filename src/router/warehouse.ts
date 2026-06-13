@@ -5,6 +5,8 @@ import { warehousePageInfo, warehousePageActionInfo, addWarehouse, editWarehouse
 import { pageValidator } from '../validator/page.ts'
 import { addWarehouseValidator, editWarehouseValidator, deleteWarehouseValidator, warehouseInfoValidator, warehouseActionInfoValidator, oneWarehouseInfoValidator, editWarehouseDescriptionValidator, randomWarehouseNameValidator, addHandleWarehouseValidator } from '../validator/warehouse.ts'
 import { checkWarehouseUser } from '../middleware/checkWarehouseUser.ts'
+import { checkAdminAuth } from '../middleware/checkAdminAuth.ts'
+import { checkStaffAuth } from '../middleware/checkStaffAuth.ts'
 
 // 分页获取仓库信息
 router.get('/', pageValidator, warehouseInfoValidator, warehousePageInfo)
@@ -16,16 +18,16 @@ router.get('/action', pageValidator, warehouseActionInfoValidator, warehousePage
 router.get('/info', oneWarehouseInfoValidator, warehouseInfo)
 
 // 新增仓库
-router.post('/add', addWarehouseValidator, addWarehouse)
+router.post('/add', checkAdminAuth, addWarehouseValidator, addWarehouse)
 
 // 仓库编辑功能
-router.patch('/edit', editWarehouseValidator, editWarehouse)
+router.patch('/edit', checkAdminAuth, editWarehouseValidator, editWarehouse)
 
 // 仓库描述编辑功能
-router.patch('/editDescription', editWarehouseDescriptionValidator, editWarehouseDescription)
+router.patch('/editDescription', checkAdminAuth, editWarehouseDescriptionValidator, editWarehouseDescription)
 
 // 仓库删除功能
-router.patch('/delete', deleteWarehouseValidator, deleteWarehouse)
+router.patch('/delete', checkAdminAuth, deleteWarehouseValidator, deleteWarehouse)
 
 // 获取仓库名
 router.get('/name', randomWarehouseNameValidator, getWarehouseName)
@@ -34,10 +36,10 @@ router.get('/name', randomWarehouseNameValidator, getWarehouseName)
 router.get('/handle', handleWarehouse)
 
 // 新增经手仓库
-router.patch('/addHandle', addHandleWarehouseValidator, addHandleWarehouse)
+router.patch('/addHandle', checkStaffAuth, addHandleWarehouseValidator, addHandleWarehouse)
 
 // 退出经手仓库
-router.patch('/exitHandle', checkWarehouseUser, exitHandleWarehouse)
+router.patch('/exitHandle', checkStaffAuth, exitHandleWarehouse)
 
 // 获取仓库概览信息
 router.get('/overview', getWarehouseOverview)
