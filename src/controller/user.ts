@@ -3,8 +3,9 @@ import md5 from '../utils/md5.ts'
 
 import { Controller } from '../types/express.ts'
 
+import pool from '../config/db.ts'
 import { getToken } from '../utils/getToken.ts'
-import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel, userInfoModel } from '../model/user.ts'
+import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel, userInfoModel, updatePasswordModel, logoutModel } from '../model/user.ts'
 
 // 用户注册
 export const register: Controller<void> = async (req, res, next) => {
@@ -79,6 +80,59 @@ export const userInfo: Controller<void> = async (req, res, next) => {
         user_name: userInfo.user_name,
         user_role: userInfo.user_role,
       }
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 用户密码修改
+export const updatePassword: Controller<void> = async (req, res, next) => {
+  try {
+    const connection = await pool.getConnection()
+    connection.beginTransaction()
+    try {
+      const { oldPassword, newPassword } = req.body
+      const encryptedPassword = md5(oldPassword)
+      const user_id = await loginCheckModel(res.locals.userInfo.user_name, encryptedPassword)
+      if (!user_id) {
+        res.json({
+          code: 4001,
+          message: '用户密码修改失败，旧密码错误',
+        })
+        connection.rollback()
+        return
+      }
+
+      const isUpdate = await updatePasswordModel(user_id, md5(newPassword), connection)
+      if (!isUpdate) throw new Error('用户密码修改失败')
+
+      connection.commit()
+    } catch (err) {
+      connection.rollback()
+      next(err)
+    } finally {
+      connection.release()
+    }
+
+    res.json({
+      code: 200,
+      message: '用户密码修改成功',
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 用户退出
+export const logout: Controller<void> = async (req, res, next) => {
+  try {
+    const token = getToken(req)
+    await logoutModel(token)
+
+    res.json({
+      code: 200,
+      message: '用户退出成功',
     })
   } catch (err) {
     next(err)

@@ -44,3 +44,19 @@ export const userInfoModel = async (token: string, connection?: any): Promise<Ro
   const [res] = await exec.query<RowDataPacket[]>(sql, [token])
   return res[0]
 }
+
+// 用户密码修改
+export const updatePasswordModel = async (user_id: string, user_password: string, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'UPDATE t_user SET user_password = ? WHERE user_id = ?'
+  const [res] = await exec.query<OkPacket>(sql, [user_password, user_id])
+  return res.affectedRows > 0
+}
+
+// 用户退出
+export const logoutModel = async (token: string, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'UPDATE t_user_session SET token_status = 0 WHERE user_token = ?'
+  const [res] = await exec.query<OkPacket>(sql, [token])
+  return res.affectedRows > 0
+}
