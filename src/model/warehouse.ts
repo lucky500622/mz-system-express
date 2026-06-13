@@ -37,7 +37,7 @@ export const warehousePageInfoModel = async (offset: number, limit: number, m_id
 }
 
 // 分页获取仓库操作信息
-export const warehousePageActionInfoModel = async (offset: number, limit: number, m_id?: number, warehouse_m_id?: number, warehouse_name?: string, action_type?: number, user_name?: string, connection?: any): Promise<RowDataPacket[]> => {
+export const warehousePageActionInfoModel = async (offset: number, limit: number, m_id?: number, warehouse_m_id?: number, warehouse_name?: string, action_type?: number, user_name?: string, start_time?: string, end_time?: string, connection?: any): Promise<RowDataPacket[]> => {
   const exec = (connection || pool) as typeof pool
   // 拼接字段数组与值数组
   const fieldArr = []
@@ -62,6 +62,10 @@ export const warehousePageActionInfoModel = async (offset: number, limit: number
     fieldArr.push('t_user.user_name LIKE ?')
     valArr.push(`%${user_name}%`)
   }
+  if (start_time && end_time) {
+    fieldArr.push('issue_create_time >= ? AND issue_create_time < DATE_ADD(?, INTERVAL 1 DAY)')
+    valArr.push(start_time, end_time)
+  }
   const where = fieldArr.length > 0 ? 'WHERE ' : ''
   const sql = `
   SELECT t_issue_info.m_id, t_warehouse.m_id AS warehouse_m_id, issue_create_time, user_name, t_warehouse_action_info.warehouse_name, action_type
@@ -81,7 +85,8 @@ export const handleWarehouseModel = async (user_id: string, connection?: any): P
   const sql = `
   SELECT t_warehouse.m_id, warehouse_name, warehouse_type
   FROM t_warehouse 
-    INNER JOIN t_user ON t_warehouse.warehouse_user_id = ? AND t_warehouse.is_delete = 0`
+    INNER JOIN t_user ON t_warehouse.warehouse_user_id = t_user.user_id
+  WHERE t_user.user_id = ? AND t_warehouse.is_delete = 0`
   const [warehouseInfo] = await exec.query<RowDataPacket[]>(sql, [user_id])
   return warehouseInfo
 }

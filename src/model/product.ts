@@ -35,7 +35,7 @@ export const productPageInfoModel = async (offset: number, limit: number, m_id?:
 }
 
 // 分页获取产品操作信息
-export const productPageActionInfoModel = async (offset: number, limit: number, m_id?: number, product_m_id?: number, product_name?: string, action_type?: number, user_name?: string, connection?: any): Promise<RowDataPacket[]> => {
+export const productPageActionInfoModel = async (offset: number, limit: number, m_id?: number, product_m_id?: number, product_name?: string, action_type?: number, user_name?: string, start_time?: string, end_time?: string, connection?: any): Promise<RowDataPacket[]> => {
   const exec = (connection || pool) as typeof pool
   // 拼接字段数组与值数组
   const fieldArr = []
@@ -59,6 +59,10 @@ export const productPageActionInfoModel = async (offset: number, limit: number, 
   if (user_name) {
     fieldArr.push('t_user.user_name LIKE ?')
     valArr.push(`%${user_name}%`)
+  }
+  if (start_time && end_time) {
+    fieldArr.push('issue_create_time >= ? AND issue_create_time < DATE_ADD(?, INTERVAL 1 DAY)')
+    valArr.push(start_time, end_time)
   }
   const where = fieldArr.length > 0 ? 'WHERE ' : ''
   const sql = `

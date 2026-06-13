@@ -30,10 +30,10 @@ export const warehousePageInfo: Controller<void> = async (req, res, next) => {
 // 分页获取仓库操作信息
 export const warehousePageActionInfo: Controller<void> = async (req, res, next) => {
   try {
-    const { offset = 0, limit = 10, m_id, warehouse_m_id, warehouse_name, action_type, user_name } = req.query
+    const { offset = 0, limit = 10, m_id, warehouse_m_id, warehouse_name, action_type, user_name, start_time, end_time } = req.query
     const pageOffset = Number(offset)
     const pageLimit = Number(limit)
-    const actionInfo = await warehousePageActionInfoModel(pageOffset, pageLimit, Number(m_id), Number(warehouse_m_id), String(warehouse_name || ''), Number(action_type), String(user_name || ''))
+    const actionInfo = await warehousePageActionInfoModel(pageOffset, pageLimit, Number(m_id), Number(warehouse_m_id), String(warehouse_name || ''), Number(action_type), String(user_name || ''), String(start_time || ''), String(end_time || ''))
     res.json({
       code: 200,
       message: '仓库操作信息获取成功',

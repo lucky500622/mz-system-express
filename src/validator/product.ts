@@ -24,7 +24,11 @@ export const productActionInfoValidator = validate([
   query('action_type').optional()
     .isInt().withMessage('操作类型必须是整数'),
   query('user_name').optional()
-    .isString().withMessage('用户名称必须是字符串')
+    .isString().withMessage('用户名称必须是字符串'),
+  query('start_time').optional()
+    .isString().withMessage('开始时间必须是字符串'),
+  query('end_time').optional()
+    .isString().withMessage('结束时间必须是字符串')
 ])
 
 // 新增产品校验
