@@ -45,6 +45,14 @@ export const userInfoModel = async (token: string, connection?: any): Promise<Ro
   return res[0]
 }
 
+// 用户角色获取
+export const userRoleModel = async (user_name: string, connection?: any): Promise<string> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'SELECT user_role FROM t_user WHERE user_name = ?'
+  const [res] = await exec.query<RowDataPacket[]>(sql, [user_name])
+  return res[0]?.user_role
+}
+
 // 用户密码修改
 export const updatePasswordModel = async (user_id: string, user_password: string, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool

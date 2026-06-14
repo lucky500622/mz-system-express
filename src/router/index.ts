@@ -5,6 +5,7 @@ import userRouter from './user.ts'
 import warehouseRouter from './warehouse.ts'
 import productRouter from './product.ts'
 import todoRouter from './todo.ts'
+import applyRouter from './apply.ts'
 
 import { checkToken } from '../middleware/checkToken.ts'
 import { checkWarehouseUser } from '../middleware/checkWarehouseUser.ts'
@@ -24,5 +25,8 @@ router.use('/product', productRouter)
 
 // 待办事项路由
 router.use('/todo', checkWarehouseUser, todoRouter)
+
+// 申请路由
+router.use('/apply', applyRouter)
 
 export default router
