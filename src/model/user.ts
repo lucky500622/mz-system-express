@@ -68,3 +68,11 @@ export const logoutModel = async (token: string, connection?: any): Promise<bool
   const [res] = await exec.query<OkPacket>(sql, [token])
   return res.affectedRows > 0
 }
+
+// 获取用户列表
+export const userListModel = async (connection?: any): Promise<RowDataPacket[]> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `SELECT user_name, user_role FROM t_user`
+  const [res] = await exec.query<RowDataPacket[]>(sql)
+  return res
+}

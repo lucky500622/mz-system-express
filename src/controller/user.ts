@@ -5,7 +5,7 @@ import { Controller } from '../types/express.ts'
 
 import pool from '../config/db.ts'
 import { getToken } from '../utils/getToken.ts'
-import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel, userInfoModel, updatePasswordModel, logoutModel } from '../model/user.ts'
+import { registerModel, queryUserNameModel, loginCheckModel, createTokenModel, userInfoModel, updatePasswordModel, logoutModel, userListModel } from '../model/user.ts'
 
 // 用户注册
 export const register: Controller<void> = async (req, res, next) => {
@@ -133,6 +133,22 @@ export const logout: Controller<void> = async (req, res, next) => {
     res.json({
       code: 200,
       message: '用户退出成功',
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 获取用户列表
+export const userList: Controller<void> = async (req, res, next) => {
+  try {
+    const userList = await userListModel()
+    res.json({
+      code: 200,
+      message: '用户列表获取成功',
+      data: {
+        userList,
+      }
     })
   } catch (err) {
     next(err)
