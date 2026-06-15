@@ -39,7 +39,7 @@ router.get('/handle', handleWarehouse)
 router.patch('/addHandle', checkStaffAuth, addHandleWarehouseValidator, addHandleWarehouse)
 
 // 退出经手仓库
-router.patch('/exitHandle', checkStaffAuth, exitHandleWarehouse)
+router.patch('/exitHandle', checkStaffAuth, checkWarehouseUser, exitHandleWarehouse)
 
 // 获取仓库概览信息
 router.get('/overview', getWarehouseOverview)

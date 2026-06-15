@@ -68,15 +68,22 @@ export function broadcastMessage() {
 }
 
 // 定向广播
-export function sendToUser(connection?: string) {
+export function sendToUser(toSup: boolean, connection?: string, name?: string) {
   const msg = {
     time: new Date().toLocaleTimeString(),
     content: connection || '消息'
   }
   for (const [key, send] of clients) {
-    // 匹配角色为sup_admin的用户
-    if (key.includes('sup_admin')) {
-      send(msg)
+    // 匹配角色用户
+    if (toSup) {
+      if (key.includes('sup_admin')) {
+        send(msg)
+      }
+    } else {
+      if (key.includes(`${name}-staff`) || key.includes(`${name}-com_admin`)) {
+        send(msg)
+      }
     }
+
   }
 }

@@ -38,3 +38,16 @@ export const approveApplyModel = async (m_id: number, apply_status: number, conn
   const [res] = await exec.query<OkPacket>(sql, [apply_status, m_id])
   return res.affectedRows > 0
 }
+
+// 获取某用户的申请信息
+export const getApplyInfoModel = async (apply_user_id: string, connection?: any): Promise<RowDataPacket> => {
+  const sql = `
+  SELECT t_apply_info.m_id, t_apply_info.apply_role, t_apply_info.apply_create_time, t_user.user_name 
+  FROM t_apply_info 
+    INNER JOIN t_user 
+    ON t_apply_info.apply_user_id = t_user.user_id
+  WHERE apply_user_id = ? AND apply_status = 0`
+  const exec = (connection || pool) as typeof pool
+  const [res] = await exec.query<RowDataPacket[]>(sql, [apply_user_id])
+  return res[0]
+}

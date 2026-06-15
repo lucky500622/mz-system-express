@@ -2,10 +2,11 @@ import { v4 as uuidv4 } from 'uuid'
 
 import pool from '../config/db.ts'
 import { Controller } from '../types/express.ts'
-import { addApplyModel, getApplyListModel, isApplyExistModel, approveApplyModel } from '../model/apply.ts'
+import { addApplyModel, getApplyListModel, isApplyExistModel, approveApplyModel, getApplyInfoModel } from '../model/apply.ts'
 import { userRoleModelByUserName } from '../model/user.ts'
 import { sendToUser } from '../middleware/sseHandler.ts'
 import { updateUserRoleModel } from '../model/user.ts'
+import { handleWarehouseModel } from '../model/warehouse.ts'
 
 // 添加申请
 export const addApply: Controller<void> = async (req, res, next) => {
@@ -15,8 +16,8 @@ export const addApply: Controller<void> = async (req, res, next) => {
     try {
       // 申请角色判断
       const { approve_user_name, apply_role } = req.body
-      const { user_role } = await userRoleModelByUserName(approve_user_name, connection)
-      if (user_role !== 'sup_admin' || !user_role) {
+      const userInfo = await userRoleModelByUserName(approve_user_name, connection)
+      if (userInfo.user_role !== 'sup_admin' || !userInfo.user_role) {
         res.json({
           code: 4032,
           message: '审批用户角色必须为sup_admin',
@@ -44,6 +45,19 @@ export const addApply: Controller<void> = async (req, res, next) => {
         return
       }
 
+      // 若用户先前为上架管理员，则需判断是否存在经手仓库
+      if (res.locals.userInfo.user_role === 'staff') {
+        const handleInfo = await handleWarehouseModel(res.locals.userInfo.user_id, connection)
+        if (handleInfo.length > 0) {
+          res.json({
+            code: 4034,
+            message: '用户已绑定经手仓库，不能申请上架管理员',
+          })
+          connection.rollback()
+          return
+        }
+      }
+
       // 添加申请
       const apply_id = uuidv4()
       const isAdd = await addApplyModel(apply_id, res.locals.userInfo.user_id, approve_user_name, apply_role, connection)
@@ -58,7 +72,7 @@ export const addApply: Controller<void> = async (req, res, next) => {
     }
 
     // 通知审批用户申请添加
-    sendToUser('成员申请')
+    sendToUser(true, '成员申请')
 
     res.json({
       code: 200,
@@ -111,6 +125,8 @@ export const approveApply: Controller<void> = async (req, res, next) => {
         if (!isUpdate) throw new Error('更新用户角色失败')
       }
 
+      sendToUser(false, '申请完成', user_name)
+
       connection.commit()
     } catch (err) {
       connection.rollback()
@@ -122,6 +138,21 @@ export const approveApply: Controller<void> = async (req, res, next) => {
     res.json({
       code: 200,
       message: '审批申请成功',
+    })
+  } catch (err) {
+    next(err)
+  }
+}
+
+// 获取某用户的申请信息
+export const getApplyInfo: Controller<void> = async (req, res, next) => {
+  try {
+    const applyInfo = await getApplyInfoModel(res.locals.userInfo.user_id)
+
+    res.json({
+      code: 200,
+      message: '获取申请信息成功',
+      data: applyInfo || {}
     })
   } catch (err) {
     next(err)
