@@ -3,7 +3,8 @@ import { v4 as uuidv4 } from 'uuid'
 import pool from '../config/db.ts'
 import { Controller } from '../types/express.ts'
 import { addApplyModel } from '../model/apply.ts'
-import { userRoleModel, userInfoModel } from '../model/user.ts'
+import { userRoleModel } from '../model/user.ts'
+import { sendToUser } from '../middleware/sseHandler.ts'
 
 // 添加申请
 export const addApply: Controller<void> = async (req, res, next) => {
@@ -29,6 +30,9 @@ export const addApply: Controller<void> = async (req, res, next) => {
     } finally {
       connection.release()
     }
+
+    // 通知审批用户申请添加
+    sendToUser()
 
     res.json({
       code: 200,
