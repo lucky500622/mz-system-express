@@ -1,10 +1,16 @@
 import express from 'express'
-import { addApplyValidator } from '../validator/apply.ts'
-import { addApply } from '../controller/apply.ts'
+import { addApplyValidator, approveApplyValidator } from '../validator/apply.ts'
+import { addApply, getApplyList, approveApply } from '../controller/apply.ts'
 
 const router = express.Router()
 
 // 添加申请路由
 router.post('/add', addApplyValidator, addApply)
+
+// 获取申请列表路由
+router.get('/list', getApplyList)
+
+// 审批申请路由
+router.patch('/approve', approveApplyValidator, approveApply)
 
 export default router

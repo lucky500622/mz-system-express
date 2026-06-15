@@ -34,7 +34,7 @@ export const createTokenModel = async (token: string, user_id: string, expireDat
   return res.affectedRows > 0
 }
 
-// 用户信息获取
+// 用户信息获取，根据token查询
 export const userInfoModel = async (token: string, connection?: any): Promise<RowDataPacket> => {
   const exec = (connection || pool) as typeof pool
   const sql = `
@@ -45,12 +45,12 @@ export const userInfoModel = async (token: string, connection?: any): Promise<Ro
   return res[0]
 }
 
-// 用户角色获取
-export const userRoleModel = async (user_name: string, connection?: any): Promise<string> => {
+// 用户信息获取，根据用户名查询
+export const userRoleModelByUserName = async (user_name: string, connection?: any): Promise<RowDataPacket> => {
   const exec = (connection || pool) as typeof pool
-  const sql = 'SELECT user_role FROM t_user WHERE user_name = ?'
+  const sql = 'SELECT user_name, user_role, user_id FROM t_user WHERE user_name = ?'
   const [res] = await exec.query<RowDataPacket[]>(sql, [user_name])
-  return res[0]?.user_role
+  return res[0]
 }
 
 // 用户密码修改
@@ -75,4 +75,12 @@ export const userListModel = async (connection?: any): Promise<RowDataPacket[]> 
   const sql = `SELECT user_name, user_role FROM t_user`
   const [res] = await exec.query<RowDataPacket[]>(sql)
   return res
+}
+
+// 修改用户角色
+export const updateUserRoleModel = async (user_id: string, user_role: string, connection?: any): Promise<boolean> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = 'UPDATE t_user SET user_role = ? WHERE user_id = ?'
+  const [res] = await exec.query<OkPacket>(sql, [user_role, user_id])
+  return res.affectedRows > 0
 }

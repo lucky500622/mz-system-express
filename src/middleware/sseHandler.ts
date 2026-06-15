@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express'
 
-import { userRoleModel } from '../model/user.ts'
+import { userRoleModelByUserName } from '../model/user.ts'
 
 // 定义SSE发送函数类型
 type SseSendFn = (data: unknown) => void
@@ -13,7 +13,7 @@ export async function sseHandler(req: Request, res: Response) {
   if (!user_name) {
     return res.status(401).end('缺少用户标识')
   }
-  const user_role = await userRoleModel(String(user_name))
+  const { user_role } = await userRoleModelByUserName(String(user_name))
   if (!user_role) {
     return res.status(401).end('用户不存在')
   }
@@ -68,10 +68,10 @@ export function broadcastMessage() {
 }
 
 // 定向广播
-export function sendToUser() {
+export function sendToUser(connection?: string) {
   const msg = {
     time: new Date().toLocaleTimeString(),
-    content: '消息'
+    content: connection || '消息'
   }
   for (const [key, send] of clients) {
     // 匹配角色为sup_admin的用户
