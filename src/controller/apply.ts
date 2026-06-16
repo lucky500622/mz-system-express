@@ -4,7 +4,7 @@ import pool from '../config/db.ts'
 import { Controller } from '../types/express.ts'
 import { addApplyModel, getApplyListModel, isApplyExistModel, approveApplyModel, getApplyInfoModel } from '../model/apply.ts'
 import { userRoleModelByUserName } from '../model/user.ts'
-import { sendToUser } from '../middleware/sseHandler.ts'
+import { sendToUser } from './sseHandler.ts'
 import { updateUserRoleModel } from '../model/user.ts'
 import { handleWarehouseModel } from '../model/warehouse.ts'
 

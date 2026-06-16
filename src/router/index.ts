@@ -9,7 +9,7 @@ import applyRouter from './apply.ts'
 
 import { checkToken } from '../middleware/checkToken.ts'
 import { checkWarehouseUser } from '../middleware/checkWarehouseUser.ts'
-import { sseHandler } from '../middleware/sseHandler.ts'
+import { sseHandler } from '../controller/sseHandler.ts'
 
 // SSE 路由
 router.get('/sse', sseHandler)
