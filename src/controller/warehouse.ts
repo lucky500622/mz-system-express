@@ -7,6 +7,7 @@ import { warehousePageInfoModel, addWarehouseModel, warehousePageActionInfoModel
 import { deleteWarehouseProductModel, downListAllProductsModel } from '../model/product.ts'
 import { deleteAllTodoModel } from '../model/todo.ts'
 import { addIssueInfoModel } from '../model/issue.ts'
+import { getApplyInfoModel } from '../model/apply.ts'
 
 // 分页获取仓库信息
 export const warehousePageInfo: Controller<void> = async (req, res, next) => {
@@ -313,6 +314,17 @@ export const addHandleWarehouse: Controller<void> = async (req, res, next) => {
     const connection = await pool.getConnection()
     connection.beginTransaction()
     try {
+      // 检查用户是否有申请
+      const applyInfo = await getApplyInfoModel(res.locals.userInfo.user_id, connection)
+      if (applyInfo) {
+        res.json({
+          code: 4016,
+          message: '用户已存在申请，需先等待申请结果'
+        })
+        connection.rollback()
+        return
+      }
+
       // 获取仓库信息
       const { m_id } = req.body
       const warehouseInfo = await warehouseInfoModel(m_id, connection)
