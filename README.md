@@ -5,13 +5,23 @@
 ## 🛠️ 快速启动
 
 ### 数据库初始化
-CREATE DATABASE IF NOT EXISTS mz_system DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_cs;
-USE mz_system;
-mysql -u** -p** mz_system < "..\mz-system-express\db\mz-system-schema.sql"
+
+- CREATE DATABASE IF NOT EXISTS mz_system DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_cs;
+- USE mz_system;
+
+- mysql -u** -p** mz_system < "..\mz-system-express\db\mz-system-schema.sql"
 
 ### 项目启动
-npm install
-npm run dev
+
+- npm install
+
+开发
+- npm run dev
+
+部署
+- 通过内外穿透部署(此项目前端已经配置了ngrok的对应参数配置，故后端建议使用ngrok进行部署)
+- npm run dev后，打开ngrok对应的终端，输入ngrok http 3000
+
 
 ## 🚀 技术栈
 
