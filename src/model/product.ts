@@ -185,6 +185,19 @@ export const warehouseProductModel = async (m_id: number, product_m_id?: number,
   return res
 }
 
+// 获取仓库下全部产品名
+export const warehouseProductNameModel = async (text: string, m_id: number, limit: number, connection?: any): Promise<RowDataPacket[]> => {
+  const exec = (connection || pool) as typeof pool
+  const sql = `
+  SELECT product_name AS name
+  FROM t_product
+    INNER JOIN t_warehouse ON t_product.product_belong_id = t_warehouse.warehouse_id AND t_warehouse.m_id = ? AND t_warehouse.is_delete = 0
+  WHERE product_name LIKE ? AND t_product.is_delete = 0
+  ORDER BY RAND() LIMIT ?`
+  const [res] = await exec.query<RowDataPacket[]>(sql, [m_id, `%${text}%`, limit])
+  return res
+}
+
 // 上下架产品数量调整
 export const listProductModel = async (m_id: number, product_list_num: number, connection?: any): Promise<boolean> => {
   const exec = (connection || pool) as typeof pool

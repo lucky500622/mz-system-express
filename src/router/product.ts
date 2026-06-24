@@ -1,7 +1,7 @@
 import express from 'express'
 const router = express.Router()
 
-import { productPageInfo, productPageActionInfo, addProduct, deleteProduct, adjustProductNum, editProductDescription, getProductName, getWarehouseProduct, listProduct, saleProduct, getProductOverview, getProductDayActionInfo, getProductWarning } from '../controller/product.ts'
+import { productPageInfo, productPageActionInfo, addProduct, deleteProduct, adjustProductNum, editProductDescription, getProductName, getWarehouseProduct, listProduct, saleProduct, getProductOverview, getProductDayActionInfo, getProductWarning, getWarehouseProductName } from '../controller/product.ts'
 import { pageValidator } from '../validator/page.ts'
 import { addProductValidator, deleteProductValidator, adjustProductNumValidator, productInfoValidator, productActionInfoValidator, editProductDescriptionValidator, productNameValidator, listProductValidator, saleProductValidator, warehouseProductValidator } from '../validator/product.ts'
 import { checkWarehouseUser } from '../middleware/checkWarehouseUser.ts'
@@ -31,6 +31,9 @@ router.get('/name', productNameValidator, getProductName)
 
 // 获取仓库产品信息
 router.get('/infoOfWarehouse', checkWarehouseUser, warehouseProductValidator, getWarehouseProduct)
+
+// 获取仓库产品全部名称
+router.get('/nameOfWarehouse', checkWarehouseUser, productNameValidator, getWarehouseProductName)
 
 // 上下架产品
 router.patch('/list/update', checkStaffAuth, listProductValidator, listProduct)
